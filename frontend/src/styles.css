@@ -195,6 +195,12 @@ p { margin: 0 0 12px; }
 .option.wrong { background: var(--error-bg); border-color: var(--error); color: #B91C1C; }
 .score { font-size: 48px; font-weight: 800; color: var(--primary); margin: 0 0 8px; }
 
+/* ---------- duel ---------- */
+.duel-scores { display: flex; align-items: center; justify-content: space-around; gap: 12px; padding: 16px; margin-bottom: 16px; background: #F5F3FF; border-radius: 10px; text-align: center; }
+.duel-score { font-size: 40px; font-weight: 800; color: var(--primary); line-height: 1.1; }
+.duel-embedded { margin: 16px 0; }
+.duel-vs { font-weight: 700; color: var(--text-muted); }
+
 /* ---------- mobile ---------- */
 @media (max-width: 640px) {
   #root { padding: 16px 12px 40px; }

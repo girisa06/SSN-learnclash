@@ -10,6 +10,7 @@ import {
   nextQuestion,
   rememberStudent,
 } from "./game.js";
+import Challenge, { DuelStatus } from "./Challenge.jsx";
 import GameMode from "./GameMode.jsx";
 import PDFUpload from "./PDFUpload.jsx";
 
@@ -104,6 +105,7 @@ function Play({ student, quizId, challenge, onExit }) {
   const [feedback, setFeedback] = useState(null);
   const [result, setResult] = useState(null);
   const [duel, setDuel] = useState(null);
+  const [createdId, setCreatedId] = useState(null);
   const [friendId, setFriendId] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState(null);
@@ -162,6 +164,7 @@ function Play({ student, quizId, challenge, onExit }) {
     setError(null);
     try {
       const { challenge_id } = await createChallenge(Number(friendId), quizId, student.studentId);
+      setCreatedId(challenge_id);
       setDuel(await finishChallenge(challenge_id, student.studentId, result));
       setNote(`Challenge #${challenge_id} sent. Your friend plays it from "My challenges".`);
     } catch (e) {
@@ -219,12 +222,13 @@ function Play({ student, quizId, challenge, onExit }) {
           <p className="score">{result.score}<span className="muted"> / 100</span></p>
           <p className="muted">{result.earnedPoints}/{result.maxPoints} points &middot; best streak {result.bestStreak} &middot; {result.earnedXp} XP</p>
           {busy && <Loading text="Submitting your score..." />}
-          {duel && (
+          {duel && duel.status === "done" && (
             <div className="notice">
-              {duel.status === "done"
-                ? `Duel finished. ${duel.winner_id == null ? "It's a tie." : duel.winner_id === student.studentId ? "You won!" : "You lost."} Ratings: A ${duel.student_a_new_rating}, B ${duel.student_b_new_rating}`
-                : "Score submitted. Waiting for your opponent to play."}
+              {`Duel finished. ${duel.winner_id == null ? "It's a tie." : duel.winner_id === student.studentId ? "You won!" : "You lost."} Ratings: A ${duel.student_a_new_rating}, B ${duel.student_b_new_rating}`}
             </div>
+          )}
+          {duel && duel.status !== "done" && (
+            <DuelStatus embedded challengeId={challenge?.id ?? createdId} student={student} />
           )}
           {note && <div className="notice">{note}</div>}
           {!challenge && !duel && (
@@ -242,7 +246,7 @@ function Play({ student, quizId, challenge, onExit }) {
 }
 
 /* --------------------------------------------------------------- lobby */
-function Lobby({ student, mode, onPlay, onLeave, onChangeMode }) {
+function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWatch }) {
   const [quizzes, setQuizzes] = useState([]);
   const [challenges, setChallenges] = useState([]);
   const [board, setBoard] = useState([]);
@@ -278,6 +282,7 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode }) {
           <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId} &middot; {mode === "pdf" ? "PDF mode" : "NCERT mode"}</div>
         </div>
         <div className="btn-row">
+          <button className="btn btn-small" onClick={onChallenge}>Challenge a Friend</button>
           <button className="btn btn-secondary btn-small" onClick={onChangeMode}>Change mode</button>
           <button className="btn btn-secondary btn-small" onClick={load} disabled={loading}>Refresh</button>
           <button className="btn btn-secondary btn-small" onClick={onLeave}>Leave</button>
@@ -325,6 +330,9 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode }) {
               {c.my_score == null && c.status !== "done" && (
                 <button className="btn btn-small" onClick={() => onPlay({ quizId: c.quiz_id ?? quizIdFor(quizzes, c.quiz_title), challenge: c })}>Play Quiz</button>
               )}
+              {c.my_score != null && (
+                <button className="btn btn-secondary btn-small" onClick={() => onWatch(c.id)}>{c.status === "done" ? "Results" : "Live status"}</button>
+              )}
             </li>
           ))}
         </ul>
@@ -365,6 +373,8 @@ export default function App() {
     return saved?.studentId != null ? { ...saved, name: localStorage.getItem("quizDuel.name") ?? "" } : null;
   });
   const [playing, setPlaying] = useState(null);
+  const [challenging, setChallenging] = useState(false);
+  const [watching, setWatching] = useState(null); // challenge id whose live status is open
   // 'ncert' | 'pdf' | null. Flow: mode -> join -> lobby -> quiz.
   const [gameMode, setGameMode] = useState(() => {
     try { return localStorage.getItem("quizDuel.mode"); } catch { return null; }
@@ -380,16 +390,38 @@ export default function App() {
     localStorage.removeItem("quizDuel.name");
     chooseMode(null);
     setPlaying(null);
+    setChallenging(false);
+    setWatching(null);
     setStudent(null);
   };
+
+  const home = student && !playing && !challenging && watching == null;
 
   return (
     <>
       <h1>Quiz Duel</h1>
       {!gameMode && <GameMode onSelectMode={chooseMode} />}
       {gameMode && !student && <Join onJoined={setStudent} onBack={() => chooseMode(null)} />}
-      {gameMode && student && !playing && (
-        <Lobby student={student} mode={gameMode} onPlay={setPlaying} onLeave={leave} onChangeMode={() => chooseMode(null)} />
+      {gameMode && home && (
+        <Lobby
+          student={student}
+          mode={gameMode}
+          onPlay={setPlaying}
+          onLeave={leave}
+          onChangeMode={() => chooseMode(null)}
+          onChallenge={() => setChallenging(true)}
+          onWatch={setWatching}
+        />
+      )}
+      {gameMode && student && challenging && (
+        <Challenge
+          student={student}
+          onBack={() => setChallenging(false)}
+          onStart={(p) => { setChallenging(false); setPlaying(p); }}
+        />
+      )}
+      {gameMode && student && watching != null && (
+        <DuelStatus challengeId={watching} student={student} onBack={() => setWatching(null)} />
       )}
       {gameMode && student && playing && (
         <Play student={student} quizId={playing.quizId} challenge={playing.challenge} onExit={() => setPlaying(null)} />

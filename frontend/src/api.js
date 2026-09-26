@@ -147,6 +147,10 @@ export const getChallenges = async (studentId) => {
   return result.challenges ?? result;
 };
 
+// Poll one challenge: { status, student_a_id/b_id, student_a_score/b_score, winner_id, student_a_elo/b_elo, ... }
+export const getChallengeStatus = (challengeId) =>
+  jsonGet(`/api/challenges/${encodeURIComponent(challengeId)}/status`);
+
 export const getLeaderboard = async (classroomId) => {
   const result = await jsonGet(`/api/leaderboard/${encodeURIComponent(classroomId)}`);
   return result.leaderboard ?? result;
