@@ -1,0 +1,73 @@
+{
+  "title": "Laws of Motion",
+  "subject": "Physics",
+  "class_level": "9",
+  "chapter": "Ch 9: Force and Laws of Motion",
+  "questions": [
+    {
+      "q": "What is the SI unit of force?",
+      "options": [
+        "Joule",
+        "Pascal",
+        "Newton",
+        "Watt"
+      ],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "Force is measured in Newtons (N), where 1 N = 1 kg·m/s².",
+      "topic": "force"
+    },
+    {
+      "q": "Which property of an object determines its inertia?",
+      "options": [
+        "Volume",
+        "Mass",
+        "Velocity",
+        "Shape"
+      ],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "Inertia is directly proportional to the mass of an object.",
+      "topic": "inertia"
+    },
+    {
+      "q": "Which law states that for every action, there is an equal and opposite reaction?",
+      "options": [
+        "Newton's First Law",
+        "Newton's Second Law",
+        "Newton's Third Law",
+        "Law of Universal Gravitation"
+      ],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Newton's Third Law describes action-reaction force pairs.",
+      "topic": "laws_of_motion"
+    },
+    {
+      "q": "What is the formula derived from Newton's Second Law of Motion?",
+      "options": [
+        "F = m/a",
+        "F = m * a",
+        "F = m + a",
+        "F = a/m"
+      ],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "Force equals mass multiplied by acceleration (F = ma).",
+      "topic": "laws_of_motion"
+    },
+    {
+      "q": "A momentum of an object of mass m moving with velocity v is given by:",
+      "options": [
+        "(mv)²",
+        "m v²",
+        "m v",
+        "m / v"
+      ],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Momentum (p) is defined as the product of mass and velocity (p = mv).",
+      "topic": "momentum"
+    }
+  ]
+}

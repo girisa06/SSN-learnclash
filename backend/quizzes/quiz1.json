@@ -1,0 +1,111 @@
+{
+  "title": "General Knowledge Mix",
+  "subject": "General Knowledge",
+  "questions": [
+    {
+      "q": "What is the capital of France?",
+      "options": ["Berlin", "Madrid", "Paris", "Rome"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "Paris has been the capital of France since the 10th century."
+    },
+    {
+      "q": "Who was the first President of the United States?",
+      "options": ["Thomas Jefferson", "George Washington", "John Adams", "Abraham Lincoln"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "George Washington served as the first U.S. President from 1789 to 1797."
+    },
+    {
+      "q": "What is 8 x 7?",
+      "options": ["54", "56", "64", "48"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "8 multiplied by 7 equals 56."
+    },
+    {
+      "q": "Who wrote the 'Harry Potter' book series?",
+      "options": ["J.K. Rowling", "Roald Dahl", "C.S. Lewis", "Rick Riordan"],
+      "answer": 0,
+      "difficulty": "easy",
+      "explanation": "J.K. Rowling wrote the Harry Potter series, published between 1997 and 2007."
+    },
+    {
+      "q": "What planet is closest to the sun?",
+      "options": ["Venus", "Mercury", "Earth", "Mars"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "Mercury is the closest planet to the sun."
+    },
+    {
+      "q": "Which river is traditionally considered the longest in the world?",
+      "options": ["Amazon", "Yangtze", "Nile", "Mississippi"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "The Nile, at about 6,650 km, is traditionally cited as the world's longest river."
+    },
+    {
+      "q": "In which year did World War II end?",
+      "options": ["1943", "1944", "1945", "1946"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "World War II ended in 1945 with the surrender of Japan and Germany."
+    },
+    {
+      "q": "What is the square root of 144?",
+      "options": ["11", "12", "13", "14"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "12 x 12 = 144, so the square root of 144 is 12."
+    },
+    {
+      "q": "Who wrote 'Pride and Prejudice'?",
+      "options": ["Emily Bronte", "Jane Austen", "Virginia Woolf", "Mary Shelley"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "Jane Austen published 'Pride and Prejudice' in 1813."
+    },
+    {
+      "q": "What is the chemical symbol for gold?",
+      "options": ["Go", "Gd", "Au", "Ag"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Au comes from the Latin word for gold, 'aurum'."
+    },
+    {
+      "q": "Which country has the most time zones (including overseas territories)?",
+      "options": ["Russia", "United States", "France", "China"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "France spans 12 time zones due to its overseas territories, more than any other country."
+    },
+    {
+      "q": "Who was the Byzantine Emperor during the fall of Constantinople in 1453?",
+      "options": ["Justinian I", "Constantine XI", "Basil II", "Michael VIII"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Constantine XI Palaiologos died defending Constantinople when it fell to the Ottomans in 1453."
+    },
+    {
+      "q": "What is the value of pi rounded to 4 decimal places?",
+      "options": ["3.1415", "3.1416", "3.1417", "3.1414"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Pi rounded to four decimal places is 3.1416."
+    },
+    {
+      "q": "Who wrote 'One Hundred Years of Solitude'?",
+      "options": ["Jorge Luis Borges", "Pablo Neruda", "Gabriel García Márquez", "Mario Vargas Llosa"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Gabriel García Márquez published this landmark of magical realism in 1967."
+    },
+    {
+      "q": "What is the atomic number of Uranium?",
+      "options": ["82", "88", "92", "94"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Uranium has 92 protons, giving it atomic number 92."
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "base_url": "http://localhost:8000",
+  "note": "Updated for Phase 3 + Elo/BKT pivot. All routes are implemented with real database logic. Validation errors return 400; missing resources 404.",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "implemented": true,
+      "request": null,
+      "response": {
+        "status": "ok"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/classrooms/create",
+      "implemented": true,
+      "description": "Teacher creates a new classroom. Generates a unique 4-char code.",
+      "request": {
+        "teacher_name": "Ms. Rao (optional)"
+      },
+      "response": {
+        "classroom_id": 1,
+        "code": "ABC1"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/classrooms/join",
+      "implemented": true,
+      "description": "Student joins a classroom using its code.",
+      "request": {
+        "code": "ABC1",
+        "name": "Arjun"
+      },
+      "response": {
+        "student_id": 42,
+        "classroom_id": 1,
+        "avatar_choices": [
+          "🐉",
+          "🤖",
+          "🧙",
+          "🦁",
+          "🚀",
+          "⚡"
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/classrooms/{classroom_id}/quizzes",
+      "implemented": true,
+      "description": "List quizzes available in a classroom.",
+      "request": null,
+      "response": {
+        "quizzes": [
+          {
+            "id": 1,
+            "title": "Science Basics",
+            "subject": "Science",
+            "question_count": 15
+          },
+          {
+            "id": 2,
+            "title": "Rookie Challenge",
+            "subject": "General Knowledge",
+            "question_count": 5
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/quizzes/{quiz_id}",
+      "implemented": true,
+      "description": "Fetch full quiz with questions. Answer index is withheld here; game logic checks answers server-side. 404 if quiz_id doesn't exist.",
+      "request": null,
+      "response": {
+        "quiz": {
+          "id": 1,
+          "title": "Science Basics",
+          "subject": "Science",
+          "classroom_id": 1
+        },
+        "questions": [
+          {
+            "id": 1,
+            "q": "What planet is closest to the sun?",
+            "options": [
+              "Venus",
+              "Mercury",
+              "Earth",
+              "Mars"
+            ],
+            "difficulty": "easy",
+            "explanation": "Mercury is the closest planet to the sun."
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/quizzes/create",
+      "implemented": true,
+      "description": "Create a quiz and its questions (used by seed_demo.py and quiz creators). classroom_id is required since quiz.classroom_id is NOT NULL in the schema. Validates: min 5 questions, difficulty in easy/medium/hard, 0 <= answer <= 3 and answer < len(options). Returns 400 on validation failure, 404 if classroom_id doesn't exist.",
+      "request": {
+        "classroom_id": 1,
+        "title": "Science Basics",
+        "subject": "Science",
+        "created_by_student_id": 42,
+        "questions": [
+          {
+            "q": "What planet is closest to the sun?",
+            "options": [
+              "Venus",
+              "Mercury",
+              "Earth",
+              "Mars"
+            ],
+            "answer": 1,
+            "difficulty": "easy",
+            "explanation": "Mercury is the closest planet to the sun."
+          }
+        ]
+      },
+      "response": {
+        "quiz_id": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/leaderboard/{classroom_id}",
+      "implemented": true,
+      "description": "Top 10 students in a classroom, sorted by level DESC then xp DESC. rating is the student's Elo.",
+      "request": null,
+      "response": {
+        "leaderboard": [
+          {
+            "id": 42,
+            "name": "Arjun",
+            "avatar": "🐉",
+            "level": 3,
+            "current_streak": 2,
+            "xp": 120,
+            "rating": 1216
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/challenges/create",
+      "implemented": true,
+      "description": "Student A challenges Student B. Status starts as waiting_for_b. 400 if A == B, 404 if quiz/student missing.",
+      "request": {
+        "quiz_id": 1,
+        "student_a_id": 42,
+        "student_b_id": 43
+      },
+      "response": {
+        "challenge_id": 7
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/challenges/{student_id}",
+      "implemented": true,
+      "description": "All challenges involving the student, newest first, from that student's point of view.",
+      "request": null,
+      "response": {
+        "challenges": [
+          {
+            "id": 7,
+            "quiz_title": "Science Basics",
+            "opponent_name": "Priya",
+            "opponent_id": 43,
+            "status": "done",
+            "my_score": 80,
+            "opponent_score": 60,
+            "winner_id": 42
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/challenges/{challenge_id}/submit",
+      "implemented": true,
+      "description": "Submit a score (0-100). When both scores are in: winner decided (tie = winner_id null), winner gets +10 XP and +1 win, level = min(xp//50 + 1, 10), and both students' Elo ratings update from pre-match ratings. 400 on invalid score, non-participant, duplicate submission, or already-completed challenge; 404 if challenge missing. While waiting for the opponent, status is waiting_for_a/waiting_for_b and xp_earned is 0.",
+      "request": {
+        "student_id": 42,
+        "score": 85
+      },
+      "response": {
+        "status": "done",
+        "winner_id": 42,
+        "xp_earned": 10,
+        "level_up": false,
+        "new_level": null,
+        "student_a_new_rating": 1216,
+        "student_b_new_rating": 1184
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/quizzes/generate-from-pdf",
+      "implemented": true,
+      "description": "multipart/form-data. Extracts PDF text, asks Groq for 5 questions, stores Quiz + Questions (with topic). Needs GROQ_API_KEY. 400 unreadable/empty PDF, 404 classroom missing, 500 LLM failure or invalid LLM output.",
+      "request": {
+        "file": "<PDF file>",
+        "classroom_id": 1,
+        "class_level": "10",
+        "subject": "Biology",
+        "chapter": "Ch 6: Photosynthesis"
+      },
+      "response": {
+        "quiz_id": 9,
+        "question_count": 8
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/mastery/update",
+      "implemented": true,
+      "description": "One BKT update for a student's answer on a topic. Row is created at p_know=0.3 if absent. 404 if student missing.",
+      "request": {
+        "student_id": 42,
+        "topic": "photosynthesis",
+        "correct": true
+      },
+      "response": {
+        "topic": "photosynthesis",
+        "p_know": 0.725
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/students/{student_id}/stats",
+      "implemented": true,
+      "description": "Elo rating, streak, and per-topic mastery. 404 if student missing.",
+      "request": null,
+      "response": {
+        "student_id": 42,
+        "elo": 1216,
+        "current_streak": 2,
+        "mastery": [
+          {
+            "topic": "photosynthesis",
+            "p_know": 0.725
+          }
+        ]
+      }
+    }
+  ]
+}

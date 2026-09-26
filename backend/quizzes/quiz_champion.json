@@ -1,0 +1,111 @@
+{
+  "title": "Champion Bot Challenge",
+  "subject": "Intermediate",
+  "questions": [
+    {
+      "q": "What is the capital of Australia?",
+      "options": ["Sydney", "Melbourne", "Canberra", "Perth"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Canberra was purpose-built as Australia's capital, chosen as a compromise between Sydney and Melbourne."
+    },
+    {
+      "q": "In what year did the Berlin Wall fall?",
+      "options": ["1987", "1989", "1991", "1993"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "The Berlin Wall fell in November 1989."
+    },
+    {
+      "q": "What is the powerhouse of the cell?",
+      "options": ["Nucleus", "Ribosome", "Mitochondria", "Golgi body"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Mitochondria produce most of the cell's ATP energy."
+    },
+    {
+      "q": "What is 15% of 200?",
+      "options": ["20", "25", "30", "35"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "15% of 200 is 0.15 x 200 = 30."
+    },
+    {
+      "q": "Who wrote the novel '1984'?",
+      "options": ["Aldous Huxley", "George Orwell", "Ray Bradbury", "H.G. Wells"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "George Orwell published '1984' in 1949."
+    },
+    {
+      "q": "Which is the longest continental mountain range in the world?",
+      "options": ["Rockies", "Alps", "Andes", "Himalayas"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "The Andes stretch about 7,000 km along the western coast of South America."
+    },
+    {
+      "q": "Which empire built the Colosseum?",
+      "options": ["Greek Empire", "Roman Empire", "Ottoman Empire", "Persian Empire"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "The Colosseum was built by the Roman Empire, completed around 80 AD."
+    },
+    {
+      "q": "What gas do plants absorb from the atmosphere for photosynthesis?",
+      "options": ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Plants absorb carbon dioxide and use it with sunlight to produce glucose."
+    },
+    {
+      "q": "What is the sum of the interior angles of a hexagon?",
+      "options": ["540°", "630°", "720°", "900°"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "A hexagon's interior angles sum to (6-2) x 180° = 720°."
+    },
+    {
+      "q": "Who wrote 'The Great Gatsby'?",
+      "options": ["Ernest Hemingway", "F. Scott Fitzgerald", "John Steinbeck", "William Faulkner"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "F. Scott Fitzgerald published 'The Great Gatsby' in 1925."
+    },
+    {
+      "q": "What is the currency of Japan?",
+      "options": ["Won", "Yuan", "Yen", "Ringgit"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Japan's currency is the yen."
+    },
+    {
+      "q": "Who painted the Mona Lisa?",
+      "options": ["Michelangelo", "Raphael", "Leonardo da Vinci", "Donatello"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Leonardo da Vinci painted the Mona Lisa in the early 16th century."
+    },
+    {
+      "q": "Which planet is known as the Red Planet?",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "Mars appears red due to iron oxide on its surface."
+    },
+    {
+      "q": "What is the value of 2 raised to the power of 8?",
+      "options": ["128", "192", "256", "512"],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "2^8 = 256."
+    },
+    {
+      "q": "Who wrote 'Moby Dick'?",
+      "options": ["Herman Melville", "Nathaniel Hawthorne", "Edgar Allan Poe", "Walt Whitman"],
+      "answer": 0,
+      "difficulty": "medium",
+      "explanation": "Herman Melville published 'Moby Dick' in 1851."
+    }
+  ]
+}

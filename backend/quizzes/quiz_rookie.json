@@ -1,0 +1,111 @@
+{
+  "title": "Rookie Bot Challenge",
+  "subject": "Beginner",
+  "questions": [
+    {
+      "q": "What is the capital of Japan?",
+      "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "Tokyo has been the capital of Japan since 1868."
+    },
+    {
+      "q": "How many continents are there on Earth?",
+      "options": ["5", "6", "7", "8"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "Earth has 7 continents: Africa, Antarctica, Asia, Australia, Europe, North America, and South America."
+    },
+    {
+      "q": "What color is the sky on a clear day?",
+      "options": ["Green", "Blue", "Gray", "Purple"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "The sky appears blue due to sunlight scattering off molecules in the atmosphere."
+    },
+    {
+      "q": "What is 5 + 3?",
+      "options": ["7", "8", "9", "6"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "5 plus 3 equals 8."
+    },
+    {
+      "q": "What is the largest mammal on Earth?",
+      "options": ["African elephant", "Blue whale", "Giraffe", "Polar bear"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "The blue whale is the largest animal known to have ever existed."
+    },
+    {
+      "q": "Which organ pumps blood through the body?",
+      "options": ["Lungs", "Liver", "Heart", "Kidney"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "The heart pumps blood through the circulatory system."
+    },
+    {
+      "q": "How many days are in a week?",
+      "options": ["5", "6", "7", "8"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "There are 7 days in a week."
+    },
+    {
+      "q": "How many sides does a triangle have?",
+      "options": ["2", "3", "4", "5"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "A triangle has 3 sides by definition."
+    },
+    {
+      "q": "What color is a ripe banana?",
+      "options": ["Green", "Red", "Yellow", "Purple"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "A ripe banana is typically yellow."
+    },
+    {
+      "q": "Who was the first person to walk on the Moon?",
+      "options": ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "Neil Armstrong stepped onto the Moon on July 20, 1969."
+    },
+    {
+      "q": "Which continent is the Sahara Desert located on?",
+      "options": ["Asia", "Africa", "Australia", "South America"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "The Sahara Desert spans much of northern Africa."
+    },
+    {
+      "q": "Who wrote 'Romeo and Juliet'?",
+      "options": ["Charles Dickens", "Mark Twain", "William Shakespeare", "Jane Austen"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "William Shakespeare wrote the tragedy 'Romeo and Juliet'."
+    },
+    {
+      "q": "What gas do humans need to breathe to survive?",
+      "options": ["Nitrogen", "Oxygen", "Carbon dioxide", "Helium"],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "Humans need oxygen for cellular respiration."
+    },
+    {
+      "q": "What is 10 x 10?",
+      "options": ["100", "110", "90", "1000"],
+      "answer": 0,
+      "difficulty": "easy",
+      "explanation": "10 multiplied by 10 equals 100."
+    },
+    {
+      "q": "How many letters are in the English alphabet?",
+      "options": ["24", "25", "26", "27"],
+      "answer": 2,
+      "difficulty": "easy",
+      "explanation": "The English alphabet has 26 letters."
+    }
+  ]
+}

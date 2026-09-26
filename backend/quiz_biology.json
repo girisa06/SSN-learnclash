@@ -1,0 +1,73 @@
+{
+  "title": "Photosynthesis & Respiration",
+  "subject": "Biology",
+  "class_level": "10",
+  "chapter": "Ch 6: Life Processes",
+  "questions": [
+    {
+      "q": "What is the primary function of chlorophyll in green plants?",
+      "options": [
+        "Absorb light energy",
+        "Absorb water from soil",
+        "Release carbon dioxide",
+        "Transport sugars"
+      ],
+      "answer": 0,
+      "difficulty": "easy",
+      "explanation": "Chlorophyll traps light energy needed to drive the chemical reaction of photosynthesis.",
+      "topic": "photosynthesis"
+    },
+    {
+      "q": "Which gas is evolved as a byproduct during photosynthesis?",
+      "options": [
+        "Carbon Dioxide",
+        "Oxygen",
+        "Nitrogen",
+        "Methane"
+      ],
+      "answer": 1,
+      "difficulty": "easy",
+      "explanation": "Oxygen is released when water molecules are split during light reactions.",
+      "topic": "photosynthesis"
+    },
+    {
+      "q": "In which cellular organelle does aerobic respiration take place?",
+      "options": [
+        "Chloroplast",
+        "Mitochondria",
+        "Ribosome",
+        "Golgi Bodies"
+      ],
+      "answer": 1,
+      "difficulty": "medium",
+      "explanation": "Mitochondria are known as the powerhouses of the cell where aerobic respiration occurs.",
+      "topic": "respiration"
+    },
+    {
+      "q": "What is the first step in cellular respiration called where glucose is broken down into pyruvate?",
+      "options": [
+        "Krebs Cycle",
+        "Electron Transport Chain",
+        "Glycolysis",
+        "Fermentation"
+      ],
+      "answer": 2,
+      "difficulty": "medium",
+      "explanation": "Glycolysis takes place in the cytoplasm and breaks down 1 glucose molecule into 2 pyruvate molecules.",
+      "topic": "respiration"
+    },
+    {
+      "q": "During anaerobic respiration in human muscle cells, pyruvate is converted into which compound?",
+      "options": [
+        "Ethanol",
+        "Lactic Acid",
+        "Acetic Acid",
+        "Glucose"
+      ],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Lack of oxygen during heavy exercise leads to lactic acid build-up in muscles.",
+      "topic": "respiration"
+    }
+  ]
+}

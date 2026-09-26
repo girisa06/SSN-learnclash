@@ -1,0 +1,322 @@
+{
+  "taken_at": "2026-09-25T20:23:45.792975",
+  "student_profile": [
+    {
+      "id": 1,
+      "classroom_id": 4,
+      "name": "string",
+      "avatar": null,
+      "level": 1,
+      "xp": 0,
+      "current_streak": 0,
+      "wins": 0,
+      "rating": 1200
+    }
+  ],
+  "quiz": [
+    {
+      "id": 1,
+      "classroom_id": 1,
+      "title": "Photosynthesis & Respiration",
+      "subject": "Biology",
+      "class_level": null,
+      "chapter": null,
+      "created_by_student_id": null,
+      "created_at": "2026-09-25T16:08:36.443941+00:00"
+    },
+    {
+      "id": 2,
+      "classroom_id": 1,
+      "title": "Laws of Motion",
+      "subject": "Physics",
+      "class_level": null,
+      "chapter": null,
+      "created_by_student_id": null,
+      "created_at": "2026-09-25T16:08:39.583875+00:00"
+    },
+    {
+      "id": 5,
+      "classroom_id": 10,
+      "title": "Photosynthesis",
+      "subject": "Biology",
+      "class_level": "10",
+      "chapter": "Photosynthesis",
+      "created_by_student_id": null,
+      "created_at": "2026-09-25T17:33:01.100619+00:00"
+    }
+  ],
+  "question": [
+    {
+      "id": 1,
+      "quiz_id": 1,
+      "q_text": "What is the primary function of chlorophyll in green plants?",
+      "options": [
+        "Absorb light energy",
+        "Absorb water from soil",
+        "Release carbon dioxide",
+        "Transport sugars"
+      ],
+      "answer_index": 0,
+      "difficulty": "easy",
+      "explanation": "Chlorophyll traps light energy needed to drive the chemical reaction of photosynthesis.",
+      "topic": null
+    },
+    {
+      "id": 2,
+      "quiz_id": 1,
+      "q_text": "Which gas is evolved as a byproduct during photosynthesis?",
+      "options": [
+        "Carbon Dioxide",
+        "Oxygen",
+        "Nitrogen",
+        "Methane"
+      ],
+      "answer_index": 1,
+      "difficulty": "easy",
+      "explanation": "Oxygen is released when water molecules are split during light reactions.",
+      "topic": null
+    },
+    {
+      "id": 3,
+      "quiz_id": 1,
+      "q_text": "In which cellular organelle does aerobic respiration take place?",
+      "options": [
+        "Chloroplast",
+        "Mitochondria",
+        "Ribosome",
+        "Golgi Bodies"
+      ],
+      "answer_index": 1,
+      "difficulty": "medium",
+      "explanation": "Mitochondria are known as the powerhouses of the cell where aerobic respiration occurs.",
+      "topic": null
+    },
+    {
+      "id": 4,
+      "quiz_id": 1,
+      "q_text": "What is the first step in cellular respiration called where glucose is broken down into pyruvate?",
+      "options": [
+        "Krebs Cycle",
+        "Electron Transport Chain",
+        "Glycolysis",
+        "Fermentation"
+      ],
+      "answer_index": 2,
+      "difficulty": "medium",
+      "explanation": "Glycolysis takes place in the cytoplasm and breaks down 1 glucose molecule into 2 pyruvate molecules.",
+      "topic": null
+    },
+    {
+      "id": 5,
+      "quiz_id": 1,
+      "q_text": "During anaerobic respiration in human muscle cells, pyruvate is converted into which compound?",
+      "options": [
+        "Ethanol",
+        "Lactic Acid",
+        "Acetic Acid",
+        "Glucose"
+      ],
+      "answer_index": 1,
+      "difficulty": "hard",
+      "explanation": "Lack of oxygen during heavy exercise leads to lactic acid build-up in muscles.",
+      "topic": null
+    },
+    {
+      "id": 6,
+      "quiz_id": 2,
+      "q_text": "What is the SI unit of force?",
+      "options": [
+        "Joule",
+        "Pascal",
+        "Newton",
+        "Watt"
+      ],
+      "answer_index": 2,
+      "difficulty": "easy",
+      "explanation": "Force is measured in Newtons (N), where 1 N = 1 kgÂ·m/sÂ².",
+      "topic": null
+    },
+    {
+      "id": 7,
+      "quiz_id": 2,
+      "q_text": "Which property of an object determines its inertia?",
+      "options": [
+        "Volume",
+        "Mass",
+        "Velocity",
+        "Shape"
+      ],
+      "answer_index": 1,
+      "difficulty": "easy",
+      "explanation": "Inertia is directly proportional to the mass of an object.",
+      "topic": null
+    },
+    {
+      "id": 8,
+      "quiz_id": 2,
+      "q_text": "Which law states that for every action, there is an equal and opposite reaction?",
+      "options": [
+        "Newton's First Law",
+        "Newton's Second Law",
+        "Newton's Third Law",
+        "Law of Universal Gravitation"
+      ],
+      "answer_index": 2,
+      "difficulty": "medium",
+      "explanation": "Newton's Third Law describes action-reaction force pairs.",
+      "topic": null
+    },
+    {
+      "id": 9,
+      "quiz_id": 2,
+      "q_text": "What is the formula derived from Newton's Second Law of Motion?",
+      "options": [
+        "F = m/a",
+        "F = m * a",
+        "F = m + a",
+        "F = a/m"
+      ],
+      "answer_index": 1,
+      "difficulty": "medium",
+      "explanation": "Force equals mass multiplied by acceleration (F = ma).",
+      "topic": null
+    },
+    {
+      "id": 10,
+      "quiz_id": 2,
+      "q_text": "A momentum of an object of mass m moving with velocity v is given by:",
+      "options": [
+        "(mv)Â²",
+        "m vÂ²",
+        "m v",
+        "m / v"
+      ],
+      "answer_index": 2,
+      "difficulty": "hard",
+      "explanation": "Momentum (p) is defined as the product of mass and velocity (p = mv).",
+      "topic": null
+    },
+    {
+      "id": 21,
+      "quiz_id": 5,
+      "q_text": "What is the primary purpose of photosynthesis?",
+      "options": [
+        "convert light energy to chemical energy",
+        "produce heat",
+        "release nitrogen",
+        "absorb water"
+      ],
+      "answer_index": 0,
+      "difficulty": "easy",
+      "explanation": "Photosynthesis converts light energy into chemical energy stored in carbohydrates.",
+      "topic": "photosynthesis"
+    },
+    {
+      "id": 22,
+      "quiz_id": 5,
+      "q_text": "In which organelle does photosynthesis occur?",
+      "options": [
+        "mitochondria",
+        "chloroplast",
+        "nucleus",
+        "ribosome"
+      ],
+      "answer_index": 1,
+      "difficulty": "easy",
+      "explanation": "The chloroplast contains the machinery for photosynthesis.",
+      "topic": "photosynthesis"
+    },
+    {
+      "id": 23,
+      "quiz_id": 5,
+      "q_text": "Which pigment primarily captures light energy in photosynthesis?",
+      "options": [
+        "chlorophyll",
+        "hemoglobin",
+        "melanin",
+        "carotene"
+      ],
+      "answer_index": 0,
+      "difficulty": "medium",
+      "explanation": "Chlorophyll pigments absorb light to drive the photosynthetic reactions.",
+      "topic": "chlorophyll"
+    },
+    {
+      "id": 24,
+      "quiz_id": 5,
+      "q_text": "What are the raw materials used in photosynthesis?",
+      "options": [
+        "water and carbon dioxide",
+        "oxygen and glucose",
+        "nitrogen and phosphorus",
+        "sulfur and methane"
+      ],
+      "answer_index": 0,
+      "difficulty": "easy",
+      "explanation": "Photosynthesis uses water and CO₂ as reactants to produce glucose and O₂.",
+      "topic": "photosynthesis"
+    },
+    {
+      "id": 25,
+      "quiz_id": 5,
+      "q_text": "What are the main products of photosynthesis?",
+      "options": [
+        "glucose and oxygen",
+        "carbon dioxide and water",
+        "ATP and ADP",
+        "nitrogen and ammonia"
+      ],
+      "answer_index": 0,
+      "difficulty": "medium",
+      "explanation": "The process yields glucose as chemical energy and oxygen as a by‑product.",
+      "topic": "photosynthesis"
+    }
+  ],
+  "classroom": [
+    {
+      "id": 2,
+      "code": "B43D",
+      "created_at": "2026-09-25T15:44:11.288092+00:00"
+    },
+    {
+      "id": 3,
+      "code": "5Q3J",
+      "created_at": "2026-09-25T15:45:24.585992+00:00"
+    },
+    {
+      "id": 4,
+      "code": "RYCL",
+      "created_at": "2026-09-25T15:53:11.148548+00:00"
+    },
+    {
+      "id": 5,
+      "code": "GPZL",
+      "created_at": "2026-09-25T16:12:53.995636+00:00"
+    },
+    {
+      "id": 6,
+      "code": "YNEA",
+      "created_at": "2026-09-25T16:58:39.051458+00:00"
+    },
+    {
+      "id": 7,
+      "code": "OLUC",
+      "created_at": "2026-09-25T17:01:23.562917+00:00"
+    },
+    {
+      "id": 8,
+      "code": "P58H",
+      "created_at": "2026-09-25T17:18:32.763940+00:00"
+    },
+    {
+      "id": 9,
+      "code": "JAPG",
+      "created_at": "2026-09-25T17:21:39.437953+00:00"
+    },
+    {
+      "id": 10,
+      "code": "2JZA",
+      "created_at": "2026-09-25T17:32:20.984110+00:00"
+    }
+  ]
+}

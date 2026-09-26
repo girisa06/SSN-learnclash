@@ -1,0 +1,111 @@
+{
+  "title": "Legend Bot Challenge",
+  "subject": "Advanced",
+  "questions": [
+    {
+      "q": "Which element has atomic number 79?",
+      "options": ["Silver", "Platinum", "Gold", "Mercury"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Gold has 79 protons, giving it atomic number 79."
+    },
+    {
+      "q": "Who was the last Tsar of Russia?",
+      "options": ["Alexander III", "Nicholas I", "Nicholas II", "Peter the Great"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Nicholas II ruled until his abdication in 1917 and was executed in 1918."
+    },
+    {
+      "q": "Which country has the most natural lakes in the world?",
+      "options": ["Finland", "Russia", "Canada", "United States"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Canada contains more natural lakes than any other country, including most of the world's freshwater lakes."
+    },
+    {
+      "q": "What is the derivative of x^2 with respect to x?",
+      "options": ["x", "2x", "x^2", "2"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Using the power rule, the derivative of x^2 is 2x."
+    },
+    {
+      "q": "Who wrote 'In Search of Lost Time'?",
+      "options": ["Marcel Proust", "Albert Camus", "Victor Hugo", "Gustave Flaubert"],
+      "answer": 0,
+      "difficulty": "hard",
+      "explanation": "Marcel Proust wrote this seven-volume novel, published between 1913 and 1927."
+    },
+    {
+      "q": "What is the approximate speed of light in a vacuum, in km/s?",
+      "options": ["150,000", "299,792", "450,000", "600,000"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Light travels at approximately 299,792 kilometers per second in a vacuum."
+    },
+    {
+      "q": "Which treaty formally ended World War I?",
+      "options": ["Treaty of Paris", "Treaty of Versailles", "Treaty of Vienna", "Treaty of Utrecht"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "The Treaty of Versailles, signed in 1919, formally ended World War I."
+    },
+    {
+      "q": "Which African country is commonly cited as never having been formally colonized?",
+      "options": ["Kenya", "Ethiopia", "Nigeria", "Egypt"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Ethiopia successfully resisted colonization, aside from a brief Italian occupation from 1936 to 1941."
+    },
+    {
+      "q": "What is the value of Euler's number (e), rounded to 2 decimal places?",
+      "options": ["2.14", "2.72", "3.14", "1.62"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "Euler's number e is approximately 2.71828, which rounds to 2.72."
+    },
+    {
+      "q": "Who wrote 'Crime and Punishment'?",
+      "options": ["Leo Tolstoy", "Anton Chekhov", "Fyodor Dostoevsky", "Ivan Turgenev"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Fyodor Dostoevsky published 'Crime and Punishment' in 1866."
+    },
+    {
+      "q": "Which particle mediates the electromagnetic force?",
+      "options": ["Gluon", "Photon", "Boson", "Neutrino"],
+      "answer": 1,
+      "difficulty": "hard",
+      "explanation": "The photon is the force-carrying particle of electromagnetism."
+    },
+    {
+      "q": "Which philosopher was the personal tutor of Alexander the Great?",
+      "options": ["Plato", "Socrates", "Aristotle", "Pythagoras"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "Aristotle tutored Alexander the Great starting around 343 BC."
+    },
+    {
+      "q": "What is the deepest known point in Earth's oceans?",
+      "options": ["Puerto Rico Trench", "Java Trench", "Mariana Trench", "Tonga Trench"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "The Mariana Trench's Challenger Deep is the deepest known point in the ocean, about 11,000 meters deep."
+    },
+    {
+      "q": "What is the sum of the interior angles of a pentagon?",
+      "options": ["360°", "450°", "540°", "630°"],
+      "answer": 2,
+      "difficulty": "hard",
+      "explanation": "A pentagon's interior angles sum to (5-2) x 180° = 540°."
+    },
+    {
+      "q": "Who wrote 'The Divine Comedy'?",
+      "options": ["Dante Alighieri", "Giovanni Boccaccio", "Petrarch", "Niccolò Machiavelli"],
+      "answer": 0,
+      "difficulty": "hard",
+      "explanation": "Dante Alighieri wrote 'The Divine Comedy' in the early 14th century."
+    }
+  ]
+}
