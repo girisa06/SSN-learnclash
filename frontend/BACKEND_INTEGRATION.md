@@ -47,11 +47,12 @@ returns `status: "waiting_for_a"/"waiting_for_b"`; the second returns `status: "
 - **CORS error**: backend must have `CORSMiddleware` (it does now); if you see it against Render, Render is running old code, redeploy.
 - **Request hangs ~30 s then works**: Render or Neon waking from idle.
 
-## Known mismatches found in review (fix before integration)
-1. `api.js` `createChallenge` sends `{quiz_id, challenger_id, challenged_id}`; the backend needs `{quiz_id, student_a_id, student_b_id}`. Its
-   argument-order guess (`startsWith("quiz")`) never matches numeric quiz ids, so the fields are also scrambled.
-2. `game.js` imports `checkQuizAnswer`, `createQuiz` and `getChallenges` from `api.js`, but `api.js` no longer exports them
-   (removed in commit `b1aa1ec`), so `game.js` fails to load. `getQuizzes`, `getQuiz`, `getLeaderboard`, `getMastery`, `uploadPDF` are also gone.
-3. `game.js` `finishChallenge` calls `submitChallengeScore(challengeId, score, studentId)` but `api.js` takes `(challengeId, studentId, score)`; the two are swapped.
-4. ~~`POST /api/quizzes/{id}/answer` missing~~: **added to the backend**; deploy it to Render before testing against production.
-5. `fetchStudentStats(studentId = 1)` defaults to student 1, which no longer exists; pass the real id.
+## Review findings (all fixed unless noted)
+1. FIXED: `api.js` `createChallenge` sent `{challenger_id, challenged_id}`. It is now `createChallenge(quizId, studentAId, studentBId)` and sends
+   `{quiz_id, student_a_id, student_b_id}`. `game.js`'s `createChallenge(friendId, quizId, studentId)` (the signature screens use) maps to it as A = you, B = friend.
+2. FIXED: `game.js` failed to load because `api.js` had lost `checkQuizAnswer`, `createQuiz`, `getChallenges` (commit `b1aa1ec`). Restored, along with
+   `getQuizzes`, `getQuizzesByClass`, `getQuiz`, `getLeaderboard`, `getMastery`, `uploadPDF` and `createClassroom`.
+3. FIXED: `finishChallenge` passed `(challengeId, score, studentId)` to `submitChallengeScore(challengeId, studentId, score)`; arguments are now in the right order.
+4. FIXED: `POST /api/quizzes/{id}/answer` added to the backend; deploy it to Render before testing against production.
+5. OPEN (minor): `fetchStudentStats(studentId = 1)` still defaults to student 1, which no longer exists; always pass the real id.
+6. NOTE: `.env.local` points at Render, so local dev hits production until you change `VITE_API_BASE_URL`.

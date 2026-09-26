@@ -151,10 +151,11 @@ export function finishQuiz(session) {
   };
 }
 
-export const createChallenge = (friendId, quizId, studentId) => postChallenge(friendId, quizId, studentId);
+// Screens call (friendId, quizId, studentId); the challenger is student A, the friend is student B.
+export const createChallenge = (friendId, quizId, studentId) => postChallenge(quizId, studentId, friendId);
 export const getChallenges = (studentId) => fetchChallenges(studentId);
 export const finishChallenge = (challengeId, studentId, quizResult) =>
-  submitChallengeScore(challengeId, quizResult.score, studentId);
+  submitChallengeScore(challengeId, studentId, quizResult.score);
 
 export function validateQuiz(quiz) {
   const errors = [];
