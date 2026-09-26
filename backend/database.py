@@ -36,6 +36,7 @@ def get_db():
 # so columns added to tables that already exist (e.g. on Neon) must be added here.
 NEW_COLUMNS = [
     ("student_profile", "rating", "INTEGER NOT NULL DEFAULT 1200"),
+    ("student_profile", "is_demo", "BOOLEAN NOT NULL DEFAULT FALSE"),
     ("question", "topic", "VARCHAR(100)"),
     ("quiz", "class_level", "VARCHAR(20)"),
     ("quiz", "chapter", "VARCHAR(200)"),

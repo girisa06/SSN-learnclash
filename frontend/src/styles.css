@@ -273,6 +273,16 @@ p { margin: 0 0 12px; }
 .score { font-size: 48px; font-weight: 800; margin: 0 0 8px; background: var(--grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; display: inline-block; }
 .score .muted { -webkit-text-fill-color: var(--text-secondary); font-size: 16px; }
 
+/* ---------- student selector + demo accounts ---------- */
+.student-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.student-card { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border-color); border-radius: 12px; background: rgba(15, 23, 41, 0.4); }
+.student-avatar { font-size: 30px; line-height: 1; flex: none; }
+.student-info { flex: 1; min-width: 0; }
+.student-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.demo-tag { color: var(--text-secondary); font-size: 12px; font-weight: 500; }
+.student-card.demo, .leaderboard-table tr.demo td { opacity: 0.5; }
+.leaderboard-table td.act { text-align: right; white-space: nowrap; }
+
 /* ---------- duel ---------- */
 .duel-scores { display: flex; align-items: center; justify-content: space-around; gap: 12px; padding: 16px; margin-bottom: 16px; background: var(--panel); border: 1px solid var(--border-color); border-radius: 12px; text-align: center; }
 .duel-side { min-width: 0; }
@@ -295,4 +305,8 @@ p { margin: 0 0 12px; }
   .list li { flex-direction: column; align-items: stretch; }
   .list li .btn { width: 100%; }
   .leaderboard-table th, .leaderboard-table td { padding: 8px 10px; font-size: 14px; }
+  .student-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .student-card { flex-direction: column; text-align: center; gap: 6px; padding: 10px; }
+  .student-info { width: 100%; }
+  .student-card .btn { width: 100%; }
 }

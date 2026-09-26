@@ -28,15 +28,19 @@
       "method": "POST",
       "path": "/api/classrooms/join",
       "implemented": true,
-      "description": "Student joins a classroom using its code. avatar is optional; if sent it must be one of avatar_choices (400 otherwise) and is stored on the profile and returned by the leaderboard.",
+      "description": "Join a classroom by code. Without student_id: creates a new student; the name must be unused in that class, case-insensitively (409 otherwise). With student_id: logs back in as that existing student; it must belong to the class (404) and the name must match, case-insensitively (403). That is a convenience check, not real authentication. avatar is optional; it must be one of avatar_choices (400 otherwise), and on a log-in it is only adopted if the student has no avatar yet. Blank name = 400. created is false on a log-in.",
       "request": {
         "code": "ABC1",
         "name": "Arjun",
-        "avatar": "🔥"
+        "avatar": "🔥",
+        "student_id": null
       },
       "response": {
         "student_id": 42,
         "classroom_id": 1,
+        "name": "Arjun",
+        "avatar": "🔥",
+        "created": true,
         "avatar_choices": [
           "⚔️",
           "🛡️",
@@ -130,18 +134,38 @@
       "method": "GET",
       "path": "/api/leaderboard/{classroom_id}",
       "implemented": true,
-      "description": "Top 10 students in a classroom, sorted by level DESC then xp DESC. rating is the student's Elo.",
+      "description": "Top 10 students in a classroom: real students first (level DESC, xp DESC), demo accounts (is_demo) last. rating is the student's Elo. Use /api/classrooms/{classroom_id}/students for everyone.",
       "request": null,
       "response": {
         "leaderboard": [
           {
             "id": 42,
             "name": "Arjun",
-            "avatar": "🐉",
+            "avatar": "🔥",
             "level": 3,
             "current_streak": 2,
             "xp": 120,
-            "rating": 1216
+            "rating": 1216,
+            "is_demo": false
+          }
+        ]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/classrooms/{classroom_id}/students",
+      "implemented": true,
+      "description": "Every student in the classroom (no 10-row cap): real students first, then A-Z; demo accounts last. 404 if the classroom is missing.",
+      "request": null,
+      "response": {
+        "students": [
+          {
+            "id": 42,
+            "name": "Arjun",
+            "avatar": "🔥",
+            "level": 3,
+            "rating": 1216,
+            "is_demo": false
           }
         ]
       }

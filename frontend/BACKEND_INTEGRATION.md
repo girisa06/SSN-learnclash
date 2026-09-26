@@ -18,7 +18,8 @@
 ## Payloads the backend expects
 | Call | Request | Response |
 |---|---|---|
-| `POST /api/classrooms/join` | `{code, name, avatar?}` (avatar optional, one of `avatar_choices`, else 400) | `{student_id, classroom_id, avatar_choices}` |
+| `POST /api/classrooms/join` | `{code, name, avatar?, student_id?}`. No `student_id` = create (name unique per class, else 409). With `student_id` = log back in (must be in that class, 404; name must match, 403). `avatar` must be one of `avatar_choices` (400) | `{student_id, classroom_id, avatar_choices, name, avatar, created}` |
+| `GET /api/classrooms/{id}/students` | - | `{students:[{id,name,avatar,level,rating,is_demo}]}` (all students, no 10-row cap; demo last) |
 | `GET /api/classrooms/{id}/quizzes` | - | `{quizzes:[{id,title,subject,question_count}]}` |
 | `GET /api/quizzes/{id}` | - | `{quiz, questions:[{id,q,options,difficulty,explanation}]}` (no answers) |
 | `POST /api/quizzes/{id}/answer` | `{question_id, answer_index}` (0-3; `selected_option` "A"-"D" also accepted) | `{question_id, correct, is_correct, correct_answer, topic, explanation}` |
@@ -28,7 +29,7 @@
 | `POST /api/challenges/{challenge_id}/submit` | `{student_id, score}` (0-100; challenge id is in the **URL**) | `{status, winner_id, xp_earned, level_up, new_level, student_a_new_rating, student_b_new_rating}` |
 | `POST /api/mastery/update` | `{student_id, topic, correct}` | `{topic, p_know}` |
 | `GET /api/students/{id}/stats` | - | `{student_id, elo, current_streak, mastery:[{topic,p_know}]}` |
-| `GET /api/leaderboard/{classroom_id}` | - | `{leaderboard:[{id,name,avatar,level,current_streak,xp,rating}]}` |
+| `GET /api/leaderboard/{classroom_id}` | - | `{leaderboard:[{id,name,avatar,level,current_streak,xp,rating,is_demo}]}` (top 10, real students first) |
 
 **Submit twice per challenge**: once as student A and once as student B (each with their own score). The first call
 returns `status: "waiting_for_a"/"waiting_for_b"`; the second returns `status: "done"` with the winner and both new Elo ratings.

@@ -14,6 +14,7 @@ import Challenge, { DuelStatus } from "./Challenge.jsx";
 import GameMode, { JoinArena } from "./GameMode.jsx";
 import TugOfWarArena from "./TugOfWarArena.jsx";
 import PDFUpload from "./PDFUpload.jsx";
+import StudentSelector from "./StudentSelector.jsx";
 
 // Turns a raw fetch/API error into a message a player (or teammate) can act on.
 function friendlyError(e) {
@@ -26,6 +27,17 @@ function friendlyError(e) {
   }
   if (/\(404\)/.test(raw) && /Classroom not found/.test(raw)) {
     return { message: "That class code doesn't exist.", detail: "Check the 4-character code with your teacher." };
+  }
+  if (/Student A not found/.test(raw)) {
+    return { message: "Your account no longer exists.", detail: "Leave, then log in again or create a new fighter." };
+  }
+  // "POST /path failed (409): {"detail":"..."}" -> show just the server's sentence.
+  const api = raw.match(/failed \((\d{3})\):\s*(\{[\s\S]*\})\s*$/);
+  if (api) {
+    try {
+      const { detail } = JSON.parse(api[2]);
+      if (typeof detail === "string") return { message: detail };
+    } catch { /* not JSON: fall through to the raw text */ }
   }
   return { message: raw };
 }
@@ -59,14 +71,15 @@ function Join({ mode, onJoined, onBack }) {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  const join = async (code, name, avatar) => {
+  const join = async (code, name, avatar, studentId) => {
     setBusy(true);
     setError(null);
     try {
-      const res = await joinClass(code, name, avatar);
-      const student = { studentId: res.student_id, classroomId: res.classroom_id, name, avatar };
+      const res = await joinClass(code, name, avatar, studentId);
+      // On a log-back-in the server's stored name/avatar win over what was typed/picked.
+      const student = { studentId: res.student_id, classroomId: res.classroom_id, name: res.name ?? name, avatar: res.avatar ?? avatar };
       rememberStudent(student);
-      localStorage.setItem("quizDuel.name", name);
+      localStorage.setItem("quizDuel.name", student.name);
       onJoined(student);
     } catch (err) {
       setError(friendlyError(err));
@@ -96,7 +109,6 @@ function Play({ student, quizId, challenge, onExit }) {
   const [result, setResult] = useState(null);
   const [duel, setDuel] = useState(null);
   const [createdId, setCreatedId] = useState(null);
-  const [friendId, setFriendId] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -153,14 +165,14 @@ function Play({ student, quizId, challenge, onExit }) {
     }
   };
 
-  const challengeFriend = async () => {
+  const challengeFriend = async (friend) => {
     setBusy(true);
     setError(null);
     try {
-      const { challenge_id } = await createChallenge(Number(friendId), quizId, student.studentId);
+      const { challenge_id } = await createChallenge(friend.id, quizId, student.studentId);
       setCreatedId(challenge_id);
       setDuel(await finishChallenge(challenge_id, student.studentId, result));
-      setNote(`Challenge #${challenge_id} sent. Your friend plays it from "My challenges".`);
+      setNote(`Challenge #${challenge_id} sent to ${friend.name}. They play it from "My challenges".`);
     } catch (e) {
       setError(friendlyError(e));
     } finally {
@@ -229,9 +241,9 @@ function Play({ student, quizId, challenge, onExit }) {
           {note && <div className="notice">{note}</div>}
           {!challenge && !duel && (
             <div className="field">
-              <label htmlFor="friend">Challenge a friend</label>
-              <input id="friend" className="input" placeholder="Friend's student id" value={friendId} onChange={(e) => setFriendId(e.target.value)} inputMode="numeric" />
-              <button className="btn btn-block" disabled={busy || !friendId} onClick={challengeFriend}>Challenge Friend</button>
+              <h3>Challenge a friend</h3>
+              <p className="hint">They play this same quiz and your scores are compared.</p>
+              <StudentSelector classroomId={student.classroomId} myId={student.studentId} busy={busy} onChallenge={challengeFriend} />
             </div>
           )}
           <button className="btn btn-secondary btn-block" onClick={onExit}>Back to lobby</button>
@@ -278,10 +290,11 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWa
           <div>
             <div className="profile-name">{student.name || "Student"}</div>
             <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId} &middot; {mode === "pdf" ? "PDF mode" : "NCERT mode"}</div>
+            <div className="hint">Your Student ID is #{student.studentId}. Enter it on the sign-in screen to log back in.</div>
           </div>
         </div>
         <div className="btn-row">
-          <button className="btn btn-small" onClick={onChallenge}>Challenge a Friend</button>
+          <button className="btn btn-small" onClick={() => onChallenge(null)}>Challenge a Friend</button>
           <button className="btn btn-secondary btn-small" onClick={onChangeMode}>Change mode</button>
           <button className="btn btn-secondary btn-small" onClick={load} disabled={loading}>Refresh</button>
           <button className="btn btn-secondary btn-small" onClick={onLeave}>Leave</button>
@@ -343,13 +356,28 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWa
         {board.length > 0 && (
           <div className="table-scroll">
             <table className="leaderboard-table">
-              <thead><tr><th>#</th><th>Name</th><th>Level</th><th>XP</th><th>Elo</th></tr></thead>
+              <thead><tr><th>#</th><th>Name</th><th>Level</th><th>XP</th><th>Elo</th><th></th></tr></thead>
               <tbody>
                 {board.map((s, i) => (
-                  <tr key={s.id} className={s.id === student.studentId ? "me" : ""}>
+                  <tr key={s.id} className={`${s.id === student.studentId ? "me" : ""}${s.is_demo ? " demo" : ""}`.trim()}>
                     <td><span className={`place-badge${["gold", "silver", "bronze"][i] ? ` ${["gold", "silver", "bronze"][i]}` : ""}`}>{i + 1}</span></td>
-                    <td><span className="avatar-sm" aria-hidden="true">{s.avatar || "👤"}</span>{s.name}</td>
+                    <td>
+                      <span className="avatar-sm" aria-hidden="true">{s.avatar || "👤"}</span>{s.name}
+                      {s.is_demo && <span className="demo-tag"> (Demo)</span>}
+                    </td>
                     <td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td>
+                    <td className="act">
+                      {s.id !== student.studentId && (
+                        <button
+                          className="btn btn-small"
+                          disabled={s.is_demo}
+                          title={s.is_demo ? "Demo accounts can't play" : `Challenge ${s.name}`}
+                          onClick={() => onChallenge(s.id)}
+                        >
+                          Challenge ⚡
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -374,7 +402,7 @@ export default function App() {
     return saved?.studentId != null ? { ...saved, name: localStorage.getItem("quizDuel.name") ?? "" } : null;
   });
   const [playing, setPlaying] = useState(null);
-  const [challenging, setChallenging] = useState(false);
+  const [challenging, setChallenging] = useState(null); // { friendId } while the Challenge screen is open
   const [watching, setWatching] = useState(null); // challenge id whose live status is open
   // 'ncert' | 'pdf' | null. Flow: mode -> join -> lobby -> quiz.
   const [gameMode, setGameMode] = useState(() => {
@@ -391,7 +419,7 @@ export default function App() {
     localStorage.removeItem("quizDuel.name");
     chooseMode(null);
     setPlaying(null);
-    setChallenging(false);
+    setChallenging(null);
     setWatching(null);
     setStudent(null);
   };
@@ -413,15 +441,16 @@ export default function App() {
           onPlay={setPlaying}
           onLeave={leave}
           onChangeMode={() => chooseMode(null)}
-          onChallenge={() => setChallenging(true)}
+          onChallenge={(friendId) => setChallenging({ friendId })}
           onWatch={setWatching}
         />
       )}
       {gameMode && student && challenging && (
         <Challenge
           student={student}
-          onBack={() => setChallenging(false)}
-          onStart={(p) => { setChallenging(false); setPlaying(p); }}
+          initialFriendId={challenging.friendId}
+          onBack={() => setChallenging(null)}
+          onStart={(p) => { setChallenging(null); setPlaying(p); }}
         />
       )}
       {gameMode && student && watching != null && (

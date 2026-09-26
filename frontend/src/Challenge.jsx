@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createChallenge, getChallengeStatus, getLeaderboard, getQuizzes } from "./api.js";
+import { createChallenge, getChallengeStatus, getClassroomStudents, getQuizzes } from "./api.js";
 
 const POLL_MS = 1000;
 
@@ -18,8 +18,8 @@ export function DuelStatus({ challengeId, student, onBack, embedded = false }) {
 
   useEffect(() => {
     let cancelled = false;
-    getLeaderboard(student.classroomId)
-      .then((board) => !cancelled && setPeople(Object.fromEntries(board.map((s) => [s.id, s]))))
+    getClassroomStudents(student.classroomId)
+      .then((all) => !cancelled && setPeople(Object.fromEntries(all.map((s) => [s.id, s]))))
       .catch(() => {});
     return () => { cancelled = true; };
   }, [student.classroomId]);
@@ -118,7 +118,8 @@ export function DuelStatus({ challengeId, student, onBack, embedded = false }) {
 /* ------------------------------------------------------ create a duel */
 // Pick a quiz and a classmate, create the challenge, then hand off to onStart({ quizId, challenge })
 // so the challenger plays the quiz right away (their score is submitted when they finish).
-export default function Challenge({ student, onStart, onBack }) {
+// initialFriendId (optional): preselect a classmate, e.g. one clicked on the leaderboard.
+export default function Challenge({ student, initialFriendId = null, onStart, onBack }) {
   const [quizzes, setQuizzes] = useState([]);
   const [classmates, setClassmates] = useState([]);
   const [quizId, setQuizId] = useState("");
@@ -129,17 +130,20 @@ export default function Challenge({ student, onStart, onBack }) {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getQuizzes(student.classroomId), getLeaderboard(student.classroomId)])
-      .then(([q, board]) => {
+    Promise.all([getQuizzes(student.classroomId), getClassroomStudents(student.classroomId)])
+      .then(([q, everyone]) => {
         if (cancelled) return;
+        // Everyone in the class (not just the top-10 leaderboard), minus yourself and demo accounts.
+        const friends = everyone.filter((s) => s.id !== student.studentId && !s.is_demo);
         setQuizzes(q);
-        setClassmates(board.filter((s) => s.id !== student.studentId));
+        setClassmates(friends);
+        if (initialFriendId != null && friends.some((s) => s.id === Number(initialFriendId))) setFriendId(String(initialFriendId));
         if (q.length) setQuizId(String(q[0].id));
       })
       .catch((e) => !cancelled && setError(e?.message ?? String(e)))
       .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
-  }, [student.classroomId, student.studentId]);
+  }, [student.classroomId, student.studentId, initialFriendId]);
 
   const create = async (e) => {
     e.preventDefault();

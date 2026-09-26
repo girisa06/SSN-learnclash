@@ -23,17 +23,19 @@ export default function GameMode({ onSelectMode }) {
   );
 }
 
-// 3-step onboarding: avatar, display name, class code. The parent does the API call
-// (onJoin(code, name, avatar)) and passes any error element and the busy flag back in.
+// 4-step onboarding: avatar, display name, optional Student ID, class code. The parent does the
+// API call (onJoin(code, name, avatar, studentId)) and passes any error element and the busy flag back in.
+// A Student ID logs back in as that existing student; leaving it empty creates a new one.
 export function JoinArena({ mode, defaultCode = "8JUJ", busy, error, onJoin, onBack }) {
   const [avatar, setAvatar] = useState(AVATARS[0]);
   const [name, setName] = useState("");
+  const [studentId, setStudentId] = useState("");
   const [code, setCode] = useState(defaultCode);
 
   const submit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onJoin(code.trim().toUpperCase(), name.trim(), avatar);
+    onJoin(code.trim().toUpperCase(), name.trim(), avatar, studentId.trim() || null);
   };
 
   return (
@@ -65,7 +67,13 @@ export function JoinArena({ mode, defaultCode = "8JUJ", busy, error, onJoin, onB
         <input id="name" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. MasterCoder" disabled={busy} required />
       </div>
 
-      <div className="step-title"><span className="step-number">3</span> Enter Class Code (4 Letters)</div>
+      <div className="step-title"><span className="step-number">3</span> Student ID <span className="hint">(optional)</span></div>
+      <div className="field">
+        <label htmlFor="student-id" className="hint">Already played? Enter your Student ID to log back in. Leave empty to create a new fighter.</label>
+        <input id="student-id" className="input" value={studentId} onChange={(e) => setStudentId(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="e.g. 17" disabled={busy} />
+      </div>
+
+      <div className="step-title"><span className="step-number">4</span> Enter Class Code (4 Letters)</div>
       <div className="field">
         <label htmlFor="code" className="hint">Class code</label>
         <input id="code" className="input" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={4} placeholder="e.g. 8JUJ" autoCapitalize="characters" disabled={busy} required />
@@ -73,7 +81,7 @@ export function JoinArena({ mode, defaultCode = "8JUJ", busy, error, onJoin, onB
 
       <button className="btn btn-block" disabled={busy || !name.trim()}>
         {busy && <span className="spinner" role="status" aria-label="Loading" />}
-        {busy ? "Entering Arena..." : "⚔️ Enter Arena"}
+        {busy ? "Entering Arena..." : studentId ? "⚔️ Log Back In" : "⚔️ Enter Arena"}
       </button>
       <button type="button" className="btn btn-secondary btn-block" style={{ marginTop: 10 }} onClick={onBack}>← Change Mode</button>
       <p className="hint" style={{ textAlign: "center", margin: "16px 0 0" }}>

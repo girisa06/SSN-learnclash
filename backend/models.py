@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Integer,
     Float,
@@ -40,6 +41,7 @@ class StudentProfile(Base):
     current_streak = Column(Integer, default=0, nullable=False)
     wins = Column(Integer, default=0, nullable=False)
     rating = Column(Integer, default=1200, nullable=False)  # Elo rating
+    is_demo = Column(Boolean, default=False, nullable=False)  # test/seed account: shown greyed out, not challengeable in the UI
 
     classroom = relationship("Classroom", back_populates="students")
 

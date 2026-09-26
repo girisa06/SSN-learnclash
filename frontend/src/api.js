@@ -18,8 +18,12 @@ async function jsonPost(path, body) {
 /* =========================================================================
    1. JOIN CLASSROOM: Handles both joinClass and joinClassroom
    ========================================================================= */
-export const joinClassroom = async (code, name, avatar) => {
-  return jsonPost("/api/classrooms/join", avatar ? { code, name, avatar } : { code, name });
+// studentId (optional): log back in as that existing student instead of creating a new one.
+export const joinClassroom = async (code, name, avatar, studentId) => {
+  const body = { code, name };
+  if (avatar) body.avatar = avatar;
+  if (studentId != null && studentId !== "") body.student_id = Number(studentId);
+  return jsonPost("/api/classrooms/join", body);
 };
 
 // ALIAS for your App.jsx:
@@ -150,6 +154,12 @@ export const getChallenges = async (studentId) => {
 // Poll one challenge: { status, student_a_id/b_id, student_a_score/b_score, winner_id, student_a_elo/b_elo, ... }
 export const getChallengeStatus = (challengeId) =>
   jsonGet(`/api/challenges/${encodeURIComponent(challengeId)}/status`);
+
+// Every student in a class (the leaderboard is capped at 10): [{ id, name, avatar, level, rating, is_demo }]
+export const getClassroomStudents = async (classroomId) => {
+  const result = await jsonGet(`/api/classrooms/${encodeURIComponent(classroomId)}/students`);
+  return result.students ?? result;
+};
 
 export const getLeaderboard = async (classroomId) => {
   const result = await jsonGet(`/api/leaderboard/${encodeURIComponent(classroomId)}`);

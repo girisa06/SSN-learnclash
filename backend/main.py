@@ -13,7 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from bkt import update_elo, update_mastery
@@ -80,12 +80,29 @@ class ClassroomJoinRequest(BaseModel):
     code: str
     name: str
     avatar: Optional[str] = None  # one of AVATAR_CHOICES; omitted = no avatar
+    student_id: Optional[int] = None  # log back in as this existing student instead of creating one
 
 
 class ClassroomJoinResponse(BaseModel):
     student_id: int
     classroom_id: int
     avatar_choices: List[str]
+    name: str
+    avatar: Optional[str] = None
+    created: bool  # True = new student, False = logged back in as an existing one
+
+
+class ClassmateOut(BaseModel):
+    id: int
+    name: str
+    avatar: Optional[str] = None
+    level: int
+    rating: int
+    is_demo: bool
+
+
+class ClassroomStudentsResponse(BaseModel):
+    students: List[ClassmateOut]
 
 
 class QuizSummary(BaseModel):
@@ -127,6 +144,7 @@ class LeaderboardEntry(BaseModel):
     current_streak: int
     xp: int
     rating: int  # Elo
+    is_demo: bool = False
 
 
 class LeaderboardResponse(BaseModel):
@@ -219,7 +237,15 @@ def create_classroom(payload: ClassroomCreateRequest, db: Session = Depends(get_
 
 @app.post("/api/classrooms/join", response_model=ClassroomJoinResponse)
 def join_classroom(payload: ClassroomJoinRequest, db: Session = Depends(get_db)):
-    """Join a classroom by code and create a fresh StudentProfile."""
+    """Join a classroom by code.
+
+    Without student_id: create a new StudentProfile (the name must be unused in that class,
+    case-insensitively). With student_id: log back in as that existing student; it must belong to
+    the class and the name must match. This is a convenience check, not real authentication.
+    """
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Name is required")
     if payload.avatar is not None and payload.avatar not in AVATAR_CHOICES:
         raise HTTPException(status_code=400, detail=f"Avatar must be one of {AVATAR_CHOICES}")
     try:
@@ -227,23 +253,50 @@ def join_classroom(payload: ClassroomJoinRequest, db: Session = Depends(get_db))
         if not classroom:
             raise HTTPException(status_code=404, detail="Classroom not found")
 
-        student = StudentProfile(
-            classroom_id=classroom.id,
-            name=payload.name,
-            avatar=payload.avatar,
-            level=1,
-            xp=0,
-            current_streak=0,
-            wins=0,
-        )
-        db.add(student)
-        db.commit()
-        db.refresh(student)
+        if payload.student_id is not None:
+            student = db.get(StudentProfile, payload.student_id)
+            if student is None or student.classroom_id != classroom.id:
+                raise HTTPException(status_code=404, detail="Student ID not found in this class")
+            if student.name.strip().lower() != name.lower():
+                raise HTTPException(status_code=403, detail="That Student ID belongs to a different name")
+            if student.avatar is None and payload.avatar:
+                student.avatar = payload.avatar  # older accounts had no avatar: adopt the one just picked
+                db.commit()
+                db.refresh(student)
+            created = False
+        else:
+            taken = (
+                db.query(StudentProfile.id)
+                .filter(StudentProfile.classroom_id == classroom.id, func.lower(StudentProfile.name) == name.lower())
+                .first()
+            )
+            if taken:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"The name '{name}' is already taken in this class. "
+                           "Enter your Student ID to log back in, or choose another name.",
+                )
+            student = StudentProfile(
+                classroom_id=classroom.id,
+                name=name,
+                avatar=payload.avatar,
+                level=1,
+                xp=0,
+                current_streak=0,
+                wins=0,
+            )
+            db.add(student)
+            db.commit()
+            db.refresh(student)
+            created = True
 
         return {
             "student_id": student.id,
             "classroom_id": classroom.id,
             "avatar_choices": AVATAR_CHOICES,
+            "name": student.name,
+            "avatar": student.avatar,
+            "created": created,
         }
     except HTTPException:
         raise
@@ -347,12 +400,12 @@ def check_quiz_answer(quiz_id: int, payload: AnswerCheckRequest, db: Session = D
 
 @app.get("/api/leaderboard/{classroom_id}", response_model=LeaderboardResponse)
 def get_leaderboard(classroom_id: int, db: Session = Depends(get_db)):
-    """Top 10 students in a classroom, sorted by level DESC then xp DESC."""
+    """Top 10 students in a classroom: real students first (level DESC, xp DESC), demo accounts last."""
     try:
         students = (
             db.query(StudentProfile)
             .filter(StudentProfile.classroom_id == classroom_id)
-            .order_by(StudentProfile.level.desc(), StudentProfile.xp.desc())
+            .order_by(StudentProfile.is_demo.asc(), StudentProfile.level.desc(), StudentProfile.xp.desc(), StudentProfile.id)
             .limit(10)
             .all()
         )
@@ -366,12 +419,38 @@ def get_leaderboard(classroom_id: int, db: Session = Depends(get_db)):
                     "current_streak": student.current_streak,
                     "xp": student.xp,
                     "rating": student.rating,
+                    "is_demo": student.is_demo,
                 }
                 for student in students
             ]
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/classrooms/{classroom_id}/students", response_model=ClassroomStudentsResponse)
+def get_classroom_students(classroom_id: int, db: Session = Depends(get_db)):
+    """Every student in a classroom (the leaderboard is capped at 10): real students first, then A-Z."""
+    get_or_404(db, Classroom, classroom_id, "Classroom")
+    students = (
+        db.query(StudentProfile)
+        .filter(StudentProfile.classroom_id == classroom_id)
+        .order_by(StudentProfile.is_demo.asc(), func.lower(StudentProfile.name), StudentProfile.id)
+        .all()
+    )
+    return {
+        "students": [
+            {
+                "id": s.id,
+                "name": s.name,
+                "avatar": s.avatar,
+                "level": s.level,
+                "rating": s.rating,
+                "is_demo": s.is_demo,
+            }
+            for s in students
+        ]
+    }
 
 
 @app.post("/api/quizzes/create", response_model=QuizCreateResponse)
