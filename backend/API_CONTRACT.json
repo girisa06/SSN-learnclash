@@ -184,6 +184,25 @@
       }
     },
     {
+      "method": "GET",
+      "path": "/api/challenges/{challenge_id}/status",
+      "implemented": true,
+      "description": "Poll one challenge (read-only). status is waiting_for_a/waiting_for_b until both scores are in, then done. A score is null until that student submits; winner_id is null while waiting and on a tie. Elo is each student's current rating. 404 if the challenge is missing.",
+      "request": null,
+      "response": {
+        "challenge_id": 7,
+        "quiz_id": 3,
+        "status": "waiting_for_a",
+        "student_a_id": 42,
+        "student_b_id": 43,
+        "student_a_score": null,
+        "student_b_score": 60,
+        "winner_id": null,
+        "student_a_elo": 1200,
+        "student_b_elo": 1200
+      }
+    },
+    {
       "method": "POST",
       "path": "/api/challenges/{challenge_id}/submit",
       "implemented": true,

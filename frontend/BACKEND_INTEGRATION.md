@@ -24,6 +24,7 @@
 | `POST /api/quizzes/{id}/answer` | `{question_id, answer_index}` (0-3; `selected_option` "A"-"D" also accepted) | `{question_id, correct, is_correct, correct_answer, topic, explanation}` |
 | `POST /api/challenges/create` | `{quiz_id, student_a_id, student_b_id}` | `{challenge_id}` |
 | `GET /api/challenges/{student_id}` | - | `{challenges:[{id,quiz_id,quiz_title,opponent_name,opponent_id,status,my_score,opponent_score,winner_id}]}` |
+| `GET /api/challenges/{challenge_id}/status` | - | `{challenge_id, quiz_id, status, student_a_id, student_b_id, student_a_score, student_b_score, winner_id, student_a_elo, student_b_elo}` (scores/winner are `null` until known; poll until `status == "done"`) |
 | `POST /api/challenges/{challenge_id}/submit` | `{student_id, score}` (0-100; challenge id is in the **URL**) | `{status, winner_id, xp_earned, level_up, new_level, student_a_new_rating, student_b_new_rating}` |
 | `POST /api/mastery/update` | `{student_id, topic, correct}` | `{topic, p_know}` |
 | `GET /api/students/{id}/stats` | - | `{student_id, elo, current_streak, mastery:[{topic,p_know}]}` |

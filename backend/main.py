@@ -457,6 +457,19 @@ class ChallengeSubmitResponse(BaseModel):
     student_b_new_rating: int
 
 
+class ChallengeStatusResponse(BaseModel):
+    challenge_id: int
+    quiz_id: int
+    status: str  # "waiting_for_a" / "waiting_for_b" / "done"
+    student_a_id: int
+    student_b_id: int
+    student_a_score: Optional[int] = None  # null until A submits
+    student_b_score: Optional[int] = None  # null until B submits
+    winner_id: Optional[int] = None  # null on tie or while still waiting
+    student_a_elo: int
+    student_b_elo: int
+
+
 class MasteryUpdateRequest(BaseModel):
     student_id: int
     topic: str
@@ -551,6 +564,26 @@ def get_student_challenges(student_id: int, db: Session = Depends(get_db)):
         return {"challenges": result}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/challenges/{challenge_id}/status", response_model=ChallengeStatusResponse)
+def get_challenge_status(challenge_id: int, db: Session = Depends(get_db)):
+    """Poll one challenge: status, both scores, winner and both students' current Elo."""
+    challenge = get_or_404(db, Challenge, challenge_id, "Challenge")
+    student_a = get_or_404(db, StudentProfile, challenge.student_a_id, "Student A")
+    student_b = get_or_404(db, StudentProfile, challenge.student_b_id, "Student B")
+    return {
+        "challenge_id": challenge.id,
+        "quiz_id": challenge.quiz_id,
+        "status": challenge.status,
+        "student_a_id": challenge.student_a_id,
+        "student_b_id": challenge.student_b_id,
+        "student_a_score": challenge.score_a,
+        "student_b_score": challenge.score_b,
+        "winner_id": challenge.winner_id,
+        "student_a_elo": student_a.rating,
+        "student_b_elo": student_b.rating,
+    }
 
 
 @app.post("/api/challenges/{challenge_id}/submit", response_model=ChallengeSubmitResponse)
