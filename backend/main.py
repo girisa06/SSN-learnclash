@@ -152,6 +152,21 @@ class QuizCreateResponse(BaseModel):
     quiz_id: int
 
 
+class AnswerCheckRequest(BaseModel):
+    question_id: int
+    answer_index: Optional[int] = None  # 0-3 option index (what game.js sends)
+    selected_option: Optional[str] = None  # "A"-"D" letter, accepted as an alternative
+
+
+class AnswerCheckResponse(BaseModel):
+    question_id: int
+    correct: bool  # field game.js reads
+    is_correct: bool  # same value, for clients expecting this name
+    correct_answer: int  # index of the correct option
+    topic: Optional[str] = None
+    explanation: str
+
+
 # ---------- Helpers ----------
 
 def generate_code(db: Session) -> str:
@@ -279,6 +294,47 @@ def get_quiz(quiz_id: int, db: Session = Depends(get_db)):
                 }
                 for question in quiz.questions
             ],
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+def resolve_selected_index(payload: AnswerCheckRequest) -> int:
+    """Turn either answer_index (0-3) or selected_option ("A"-"D") into an option index."""
+    if payload.answer_index is not None:
+        return payload.answer_index
+    letter = (payload.selected_option or "").strip().upper()
+    if letter in ("A", "B", "C", "D"):
+        return "ABCD".index(letter)
+    raise HTTPException(status_code=400, detail="Provide answer_index (0-3) or selected_option (A-D)")
+
+
+@app.post("/api/quizzes/{quiz_id}/answer", response_model=AnswerCheckResponse)
+def check_quiz_answer(quiz_id: int, payload: AnswerCheckRequest, db: Session = Depends(get_db)):
+    """Grade one answer server-side (quiz downloads never include the answer key)."""
+    selected = resolve_selected_index(payload)
+    try:
+        question = (
+            db.query(Question)
+            .filter(Question.id == payload.question_id, Question.quiz_id == quiz_id)
+            .first()
+        )
+        if question is None:
+            raise HTTPException(status_code=404, detail="Question not found in this quiz")
+        if not 0 <= selected < len(question.options):
+            raise HTTPException(status_code=400, detail="Selected option is out of range")
+
+        correct = selected == question.answer_index
+        quiz = db.get(Quiz, quiz_id)
+        return {
+            "question_id": question.id,
+            "correct": correct,
+            "is_correct": correct,
+            "correct_answer": question.answer_index,
+            "topic": question.topic or (quiz.subject if quiz else None),
+            "explanation": question.explanation or "No explanation available",
         }
     except HTTPException:
         raise

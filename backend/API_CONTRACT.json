@@ -250,6 +250,24 @@
           }
         ]
       }
+    },
+    {
+      "method": "POST",
+      "path": "/api/quizzes/{quiz_id}/answer",
+      "implemented": true,
+      "description": "Grade one answer server-side (GET /quizzes/{id} never returns the answer key). Send answer_index (0-3) or selected_option ('A'-'D'). topic falls back to the quiz subject. 404 if the question isn't in this quiz, 400 if the option is out of range or missing.",
+      "request": {
+        "question_id": 11,
+        "answer_index": 0
+      },
+      "response": {
+        "question_id": 11,
+        "correct": true,
+        "is_correct": true,
+        "correct_answer": 0,
+        "topic": "Biology",
+        "explanation": "Chlorophyll traps light energy needed to drive the reaction."
+      }
     }
   ]
 }
