@@ -1,21 +1,81 @@
 const API_BASE_URL = (
   import.meta.env?.VITE_API_BASE_URL ?? globalThis.process?.env?.VITE_API_BASE_URL ?? ""
-).replace(/\/$/, "");
+).trim().replace(/\/+$/, "");
+
+export class ApiRequestError extends Error {
+  constructor(message, details = {}) {
+    super(message);
+    this.name = "ApiRequestError";
+    Object.assign(this, details);
+  }
+}
+
+function buildRequestUrl(path) {
+  if (!API_BASE_URL) {
+    throw new ApiRequestError("The quiz server URL is not configured.", {
+      userMessage: "Quiz server configuration is missing. Set VITE_API_BASE_URL and restart the frontend.",
+      method: undefined,
+      url: undefined,
+    });
+  }
+
+  try {
+    return new URL(String(path).replace(/^\/+/, ""), `${API_BASE_URL}/`).toString();
+  } catch (cause) {
+    throw new ApiRequestError("The quiz server URL is invalid.", {
+      userMessage: "Quiz server configuration is invalid. Check VITE_API_BASE_URL and restart the frontend.",
+      cause,
+    });
+  }
+}
 
 async function request(path, { method = "GET", body, headers = {}, signal } = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method,
-    headers: {
-      ...(body instanceof FormData ? {} : body ? { "Content-Type": "application/json" } : {}),
-      ...headers,
-    },
-    body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
-    signal,
-  });
+  const url = buildRequestUrl(path);
+  if (import.meta.env?.DEV) console.info(`[Quiz Duel API] ${method} ${url}`);
+
+  let response;
+  try {
+    response = await fetch(url, {
+      method,
+      headers: {
+        ...(body instanceof FormData ? {} : body ? { "Content-Type": "application/json" } : {}),
+        ...headers,
+      },
+      body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
+      signal,
+    });
+  } catch (cause) {
+    const aborted = cause?.name === "AbortError";
+    const userMessage = aborted
+      ? "The request was cancelled. Please try again."
+      : "The quiz server is not responding. It may be waking up; wait a few seconds and retry. If this continues, check your connection and the backend CORS settings.";
+    console.error(`[Quiz Duel API] ${method} ${url} could not be reached`, {
+      baseUrl: API_BASE_URL,
+      errorName: cause?.name,
+      errorMessage: cause?.message,
+      hint: aborted ? "Request was aborted." : "A browser network error can indicate Render cold start, offline access, DNS/TLS failure, or a CORS rejection; the browser does not expose which one.",
+    });
+    throw new ApiRequestError(userMessage, { userMessage, method, url, cause });
+  }
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
-    throw new Error(`API ${method} ${path} failed (${response.status})${detail ? `: ${detail}` : ""}`);
+    const waking = [502, 503, 504].includes(response.status);
+    const userMessage = waking
+      ? "The quiz server is waking up or temporarily unavailable. Wait a few seconds, then retry."
+      : `The quiz server returned an error (${response.status}). Please retry.`;
+    console.error(`[Quiz Duel API] ${method} ${url} returned HTTP ${response.status}`, {
+      status: response.status,
+      statusText: response.statusText,
+      responseText: detail.slice(0, 2000),
+    });
+    throw new ApiRequestError(userMessage, {
+      userMessage,
+      method,
+      url,
+      status: response.status,
+      responseText: detail,
+    });
   }
   if (response.status === 204) return null;
   return response.json();
