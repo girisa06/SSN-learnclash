@@ -1,0 +1,86 @@
+/* Tug of War arena: dark navy panel, pure CSS animations (no libraries). */
+.tow {
+  --tow-red: #FF4D6D;
+  --tow-green: #10B981;
+  background: radial-gradient(ellipse at 50% 0%, #1B2E4A 0%, #0F1729 70%);
+  border: 1px solid #2D3E5F;
+  border-radius: 16px;
+  padding: 14px 16px 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.tow-labels { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #A0AEC0; }
+.tow-score { font-weight: 600; letter-spacing: 0; text-align: center; font-size: 13px; }
+.tow-score strong { color: #fff; }
+
+.tow-field { display: flex; align-items: center; gap: 4px; height: 110px; }
+
+/* fighters */
+.tow-fighter { flex: none; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; line-height: 1; }
+.tow-player { background: radial-gradient(circle, rgba(91, 127, 255, 0.35), rgba(91, 127, 255, 0.05) 70%); box-shadow: 0 0 0 2px rgba(91, 127, 255, 0.5); }
+.tow-robot { background: radial-gradient(circle, rgba(255, 77, 109, 0.3), rgba(255, 77, 109, 0.05) 70%); box-shadow: 0 0 0 2px rgba(255, 77, 109, 0.45); }
+.tow-emoji { display: inline-block; transform-origin: 50% 100%; }
+.tow-player .tow-emoji { transform: rotate(-6deg); }          /* leaning into the pull */
+.tow-robot .tow-emoji { transform: rotate(6deg); }
+.tow-pull { animation: tow-pull 0.4s ease-out; }
+.tow-boost { animation: tow-boost 0.5s ease-out; }
+.tow-stumble { animation: tow-stumble 0.45s ease-out; }
+@keyframes tow-pull { 0% { transform: translateX(0) rotate(-6deg); } 35% { transform: translateX(-10px) rotate(-16deg) scale(1.12); } 100% { transform: translateX(0) rotate(-6deg); } }
+@keyframes tow-boost { 0% { transform: rotate(6deg); filter: none; } 35% { transform: translateX(10px) rotate(16deg) scale(1.25); filter: drop-shadow(0 0 10px var(--tow-red)); } 100% { transform: rotate(6deg); filter: none; } }
+@keyframes tow-stumble { 0% { transform: rotate(0); } 25% { transform: translateX(-5px) rotate(-14deg); } 50% { transform: translateX(5px) rotate(12deg); } 75% { transform: translateX(-3px) rotate(-6deg); } 100% { transform: rotate(0); } }
+
+/* rope + marker */
+.tow-track { position: relative; flex: 1; height: 100%; min-width: 0; }
+.tow-rope { position: absolute; top: 50%; left: 0; transform: translateY(-50%); display: block; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5)); }
+.tow-midline { position: absolute; left: 50%; top: 14px; bottom: 14px; width: 0; border-left: 2px dashed rgba(255, 255, 255, 0.45); transform: translateX(-1px); }
+
+.tow-marker {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transition-property: left;
+  transition-timing-function: ease-out;
+  transition-duration: 180ms; /* overridden inline: 180ms on correct, 300ms on wrong */
+}
+.tow-diamond {
+  position: absolute; left: -12px; top: -12px; width: 24px; height: 24px;
+  background: linear-gradient(135deg, #FF7A93, var(--tow-red));
+  border: 2px solid #fff; border-radius: 3px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 77, 109, 0.7);
+}
+.tow-flag { position: absolute; left: -1px; top: -40px; width: 2px; height: 28px; background: #fff; }
+.tow-flag::after { content: ""; position: absolute; left: 2px; top: 0; border-left: 14px solid var(--tow-red); border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+
+/* effects: green glow ring on correct, red sparks on wrong */
+.tow-glow { position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, rgba(16, 185, 129, 0.75), rgba(16, 185, 129, 0) 70%); box-shadow: 0 0 24px 8px rgba(16, 185, 129, 0.6); animation: tow-glow 0.6s ease-out forwards; pointer-events: none; }
+@keyframes tow-glow { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+.tow-sparks { position: absolute; left: 0; top: 0; pointer-events: none; }
+.tow-sparks i { position: absolute; left: -2px; top: -2px; width: 4px; height: 12px; border-radius: 2px; background: linear-gradient(#FFD166, var(--tow-red)); transform-origin: 50% 0; animation: tow-spark 0.5s ease-out forwards; }
+@keyframes tow-spark { 0% { transform: rotate(var(--a)) translateY(8px) scaleY(1); opacity: 1; } 100% { transform: rotate(var(--a)) translateY(34px) scaleY(0.2); opacity: 0; } }
+
+/* meter + status */
+.tow-meter { height: 6px; border-radius: 999px; background: rgba(255, 77, 109, 0.35); overflow: hidden; margin-top: 4px; }
+.tow-meter > span { display: block; height: 100%; background: linear-gradient(90deg, #5B7FFF, #7C5CFF); transition: width 0.25s ease-out; }
+.tow-status { margin: 8px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: #A0AEC0; }
+.tow-ended .tow-status { font-size: 16px; font-weight: 800; }
+.tow-won-player .tow-status { color: #6EE7B7; }
+.tow-won-robot .tow-status { color: #FCA5A5; }
+.tow-won-player { border-color: var(--tow-green); box-shadow: 0 0 24px rgba(16, 185, 129, 0.3); }
+.tow-won-robot { border-color: var(--tow-red); box-shadow: 0 0 24px rgba(255, 77, 109, 0.3); }
+
+/* phones */
+@media (max-width: 640px) {
+  .tow { padding: 12px 10px 10px; }
+  .tow-field { height: 96px; }
+  .tow-fighter { width: 54px; height: 54px; font-size: 30px; }
+  .tow-score { font-size: 12px; }
+  .tow-diamond { left: -10px; top: -10px; width: 20px; height: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tow-marker, .tow-meter > span { transition-duration: 0.01ms !important; }
+  .tow-pull, .tow-boost, .tow-stumble, .tow-glow, .tow-sparks i { animation-duration: 0.01ms !important; }
+}

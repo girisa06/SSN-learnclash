@@ -12,6 +12,7 @@ import {
 } from "./game.js";
 import Challenge, { DuelStatus } from "./Challenge.jsx";
 import GameMode, { JoinArena } from "./GameMode.jsx";
+import TugOfWarArena from "./TugOfWarArena.jsx";
 import PDFUpload from "./PDFUpload.jsx";
 
 // Turns a raw fetch/API error into a message a player (or teammate) can act on.
@@ -89,6 +90,7 @@ function Join({ mode, onJoined, onBack }) {
 // challenge (optional): { id, ... } -> the score is submitted to that challenge when the quiz ends.
 function Play({ student, quizId, challenge, onExit }) {
   const sessionRef = useRef(null);
+  const arenaRef = useRef(null);
   const [question, setQuestion] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [result, setResult] = useState(null);
@@ -119,7 +121,11 @@ function Play({ student, quizId, challenge, onExit }) {
     setBusy(true);
     setError(null);
     try {
-      setFeedback({ ...(await answerQuestion(sessionRef.current, index)), picked: index });
+      const graded = await answerQuestion(sessionRef.current, index);
+      setFeedback({ ...graded, picked: index });
+      // The server's verdict moves the tug-of-war marker (correct = toward you).
+      if (graded.correct) arenaRef.current?.onAnswerCorrect();
+      else arenaRef.current?.onAnswerIncorrect();
     } catch (e) {
       setError(friendlyError(e));
     } finally {
@@ -174,6 +180,8 @@ function Play({ student, quizId, challenge, onExit }) {
       </div>
       <ErrorMsg error={error} onDismiss={() => setError(null)} />
       {loading && <Loading text="Loading quiz..." />}
+
+      {session && <TugOfWarArena ref={arenaRef} playerAvatar={student.avatar || "⚔️"} pullMagnitude={0.15} />}
 
       {question && (
         <>
