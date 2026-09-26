@@ -11,7 +11,7 @@ import {
   rememberStudent,
 } from "./game.js";
 import Challenge, { DuelStatus } from "./Challenge.jsx";
-import GameMode from "./GameMode.jsx";
+import GameMode, { JoinArena } from "./GameMode.jsx";
 import PDFUpload from "./PDFUpload.jsx";
 
 // Turns a raw fetch/API error into a message a player (or teammate) can act on.
@@ -54,21 +54,18 @@ function ErrorMsg({ error, onDismiss }) {
 }
 
 /* ---------------------------------------------------------------- join */
-function Join({ onJoined, onBack }) {
-  const [code, setCode] = useState("8JUJ");
-  const [name, setName] = useState("");
+function Join({ mode, onJoined, onBack }) {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const join = async (code, name, avatar) => {
     setBusy(true);
     setError(null);
     try {
-      const res = await joinClass(code.trim().toUpperCase(), name.trim());
-      const student = { studentId: res.student_id, classroomId: res.classroom_id, name: name.trim() };
+      const res = await joinClass(code, name, avatar);
+      const student = { studentId: res.student_id, classroomId: res.classroom_id, name, avatar };
       rememberStudent(student);
-      localStorage.setItem("quizDuel.name", student.name);
+      localStorage.setItem("quizDuel.name", name);
       onJoined(student);
     } catch (err) {
       setError(friendlyError(err));
@@ -78,22 +75,13 @@ function Join({ onJoined, onBack }) {
   };
 
   return (
-    <form className="card" onSubmit={submit}>
-      <h2>Join a classroom</h2>
-      <ErrorMsg error={error} onDismiss={() => setError(null)} />
-      <div className="field">
-        <label htmlFor="code">Class code</label>
-        <input id="code" className="input" value={code} onChange={(e) => setCode(e.target.value)} maxLength={4} required autoCapitalize="characters" />
-      </div>
-      <div className="field">
-        <label htmlFor="name">Your name</label>
-        <input id="name" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Arjun" required />
-      </div>
-      <button className="btn btn-block" disabled={busy || !name.trim()}>
-        {busy && <Spinner />} {busy ? "Joining..." : "Join Game"}
-      </button>
-      <button type="button" className="btn btn-secondary btn-block" style={{ marginTop: 10 }} onClick={onBack}>Back</button>
-    </form>
+    <JoinArena
+      mode={mode}
+      busy={busy}
+      error={<ErrorMsg error={error} onDismiss={() => setError(null)} />}
+      onJoin={join}
+      onBack={onBack}
+    />
   );
 }
 
@@ -277,9 +265,12 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWa
   return (
     <>
       <div className="card profile">
-        <div>
-          <div className="profile-name">{student.name || "Student"}</div>
-          <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId} &middot; {mode === "pdf" ? "PDF mode" : "NCERT mode"}</div>
+        <div className="profile-who">
+          {student.avatar && <div className="avatar-lg" aria-hidden="true">{student.avatar}</div>}
+          <div>
+            <div className="profile-name">{student.name || "Student"}</div>
+            <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId} &middot; {mode === "pdf" ? "PDF mode" : "NCERT mode"}</div>
+          </div>
         </div>
         <div className="btn-row">
           <button className="btn btn-small" onClick={onChallenge}>Challenge a Friend</button>
@@ -348,7 +339,9 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWa
               <tbody>
                 {board.map((s, i) => (
                   <tr key={s.id} className={s.id === student.studentId ? "me" : ""}>
-                    <td>{i + 1}</td><td>{s.name}</td><td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td>
+                    <td><span className={`place-badge${["gold", "silver", "bronze"][i] ? ` ${["gold", "silver", "bronze"][i]}` : ""}`}>{i + 1}</span></td>
+                    <td>{s.avatar && <span className="avatar-sm" aria-hidden="true">{s.avatar}</span>}{s.name}</td>
+                    <td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td>
                   </tr>
                 ))}
               </tbody>
@@ -399,9 +392,12 @@ export default function App() {
 
   return (
     <>
-      <h1>Quiz Duel</h1>
+      <div className="brand">
+        <h1 className="logo"><span className="logo-icon">⚔️</span> LEARNARENA</h1>
+        <p className="tagline">Knowledge meets battle</p>
+      </div>
       {!gameMode && <GameMode onSelectMode={chooseMode} />}
-      {gameMode && !student && <Join onJoined={setStudent} onBack={() => chooseMode(null)} />}
+      {gameMode && !student && <Join mode={gameMode} onJoined={setStudent} onBack={() => chooseMode(null)} />}
       {gameMode && home && (
         <Lobby
           student={student}

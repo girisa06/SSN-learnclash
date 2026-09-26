@@ -28,21 +28,22 @@
       "method": "POST",
       "path": "/api/classrooms/join",
       "implemented": true,
-      "description": "Student joins a classroom using its code.",
+      "description": "Student joins a classroom using its code. avatar is optional; if sent it must be one of avatar_choices (400 otherwise) and is stored on the profile and returned by the leaderboard.",
       "request": {
         "code": "ABC1",
-        "name": "Arjun"
+        "name": "Arjun",
+        "avatar": "🦁"
       },
       "response": {
         "student_id": 42,
         "classroom_id": 1,
         "avatar_choices": [
-          "🐉",
-          "🤖",
-          "🧙",
+          "🎮",
+          "💼",
+          "🏢",
           "🦁",
           "🚀",
-          "⚡"
+          "🍊"
         ]
       }
     },

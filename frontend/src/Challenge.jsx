@@ -14,6 +14,15 @@ function Spinner() {
 export function DuelStatus({ challengeId, student, onBack, embedded = false }) {
   const [data, setData] = useState(null);
   const [failures, setFailures] = useState(0);
+  const [people, setPeople] = useState({}); // student id -> { name, avatar }, best-effort from the leaderboard
+
+  useEffect(() => {
+    let cancelled = false;
+    getLeaderboard(student.classroomId)
+      .then((board) => !cancelled && setPeople(Object.fromEntries(board.map((s) => [s.id, s]))))
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [student.classroomId]);
 
   useEffect(() => {
     let stopped = false;
@@ -53,7 +62,9 @@ export function DuelStatus({ challengeId, student, onBack, embedded = false }) {
   const theirs = data ? (isA ? data.student_b_score : data.student_a_score) : null;
   const myElo = data ? (isA ? data.student_a_elo : data.student_b_elo) : null;
   const theirElo = data ? (isA ? data.student_b_elo : data.student_a_elo) : null;
-  const outcome = !done ? null : data.winner_id == null ? "It's a tie." : data.winner_id === student.studentId ? "You won!" : "You lost.";
+  const meInfo = people[student.studentId];
+  const themInfo = data ? people[isA ? data.student_b_id : data.student_a_id] : null;
+  const outcome =!done ? null : data.winner_id == null ? "It's a tie." : data.winner_id === student.studentId ? "You won!" : "You lost.";
 
   return (
     <div className={embedded ? "duel duel-embedded" : "card duel"}>
@@ -69,13 +80,15 @@ export function DuelStatus({ challengeId, student, onBack, embedded = false }) {
         <>
           <div className="duel-scores">
             <div className="duel-side">
+              {(meInfo?.avatar || student.avatar) && <div className="duel-avatar" aria-hidden="true">{meInfo?.avatar || student.avatar}</div>}
               <div className="muted">You</div>
               <div className="duel-score">{mine ?? "-"}</div>
               <div className="muted">Elo {myElo}</div>
             </div>
             <div className="duel-vs">vs</div>
             <div className="duel-side">
-              <div className="muted">Opponent</div>
+              {themInfo?.avatar && <div className="duel-avatar" aria-hidden="true">{themInfo.avatar}</div>}
+              <div className="muted">{themInfo?.name ?? "Opponent"}</div>
               <div className="duel-score">{theirs ?? "-"}</div>
               <div className="muted">Elo {theirElo}</div>
             </div>

@@ -35,7 +35,7 @@ app.add_middleware(
 )
 
 VALID_DIFFICULTIES = {"easy", "medium", "hard"}
-AVATAR_CHOICES = ["🐉", "🤖", "🧙", "🦁", "🚀", "⚡"]
+AVATAR_CHOICES = ["🎮", "💼", "🏢", "🦁", "🚀", "🍊"]  # keep in sync with AVATARS in frontend/src/GameMode.jsx
 WIN_XP = 10
 XP_PER_LEVEL = 50
 MAX_LEVEL = 10
@@ -79,6 +79,7 @@ class ClassroomCreateResponse(BaseModel):
 class ClassroomJoinRequest(BaseModel):
     code: str
     name: str
+    avatar: Optional[str] = None  # one of AVATAR_CHOICES; omitted = no avatar
 
 
 class ClassroomJoinResponse(BaseModel):
@@ -219,6 +220,8 @@ def create_classroom(payload: ClassroomCreateRequest, db: Session = Depends(get_
 @app.post("/api/classrooms/join", response_model=ClassroomJoinResponse)
 def join_classroom(payload: ClassroomJoinRequest, db: Session = Depends(get_db)):
     """Join a classroom by code and create a fresh StudentProfile."""
+    if payload.avatar is not None and payload.avatar not in AVATAR_CHOICES:
+        raise HTTPException(status_code=400, detail=f"Avatar must be one of {AVATAR_CHOICES}")
     try:
         classroom = db.query(Classroom).filter(Classroom.code == payload.code).first()
         if not classroom:
@@ -227,7 +230,7 @@ def join_classroom(payload: ClassroomJoinRequest, db: Session = Depends(get_db))
         student = StudentProfile(
             classroom_id=classroom.id,
             name=payload.name,
-            avatar=None,
+            avatar=payload.avatar,
             level=1,
             xp=0,
             current_streak=0,

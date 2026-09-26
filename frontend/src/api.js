@@ -18,8 +18,8 @@ async function jsonPost(path, body) {
 /* =========================================================================
    1. JOIN CLASSROOM: Handles both joinClass and joinClassroom
    ========================================================================= */
-export const joinClassroom = async (code, name) => {
-  return jsonPost("/api/classrooms/join", { code, name });
+export const joinClassroom = async (code, name, avatar) => {
+  return jsonPost("/api/classrooms/join", avatar ? { code, name, avatar } : { code, name });
 };
 
 // ALIAS for your App.jsx:

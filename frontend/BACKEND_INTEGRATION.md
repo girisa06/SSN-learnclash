@@ -18,7 +18,7 @@
 ## Payloads the backend expects
 | Call | Request | Response |
 |---|---|---|
-| `POST /api/classrooms/join` | `{code, name}` | `{student_id, classroom_id, avatar_choices}` |
+| `POST /api/classrooms/join` | `{code, name, avatar?}` (avatar optional, one of `avatar_choices`, else 400) | `{student_id, classroom_id, avatar_choices}` |
 | `GET /api/classrooms/{id}/quizzes` | - | `{quizzes:[{id,title,subject,question_count}]}` |
 | `GET /api/quizzes/{id}` | - | `{quiz, questions:[{id,q,options,difficulty,explanation}]}` (no answers) |
 | `POST /api/quizzes/{id}/answer` | `{question_id, answer_index}` (0-3; `selected_option` "A"-"D" also accepted) | `{question_id, correct, is_correct, correct_answer, topic, explanation}` |
