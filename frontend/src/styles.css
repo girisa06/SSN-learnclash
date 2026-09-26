@@ -183,7 +183,7 @@ p { margin: 0 0 12px; }
 .mode-pdf:hover { border-color: var(--accent-purple); background: rgba(124, 92, 255, 0.1); }
 
 /* ---------- avatars ---------- */
-.avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 4px; }
+.avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 4px; }
 .avatar-option {
   aspect-ratio: 1;
   min-height: 52px;
@@ -191,7 +191,7 @@ p { margin: 0 0 12px; }
   border-radius: 12px;
   background: rgba(15, 23, 41, 0.4);
   cursor: pointer;
-  font-size: 30px;
+  font-size: 44px;
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s, border-color 0.2s;
 }
@@ -294,6 +294,5 @@ p { margin: 0 0 12px; }
   .quiz-grid { grid-template-columns: 1fr; }
   .list li { flex-direction: column; align-items: stretch; }
   .list li .btn { width: 100%; }
-  .avatar-grid { grid-template-columns: repeat(3, 1fr); }
   .leaderboard-table th, .leaderboard-table td { padding: 8px 10px; font-size: 14px; }
 }

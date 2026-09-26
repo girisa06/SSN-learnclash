@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // Must match AVATAR_CHOICES in backend/main.py (the join route rejects anything else).
-export const AVATARS = ["🎮", "💼", "🏢", "🦁", "🚀", "🍊"];
+export const AVATARS = ["⚔️", "🛡️", "🔥", "⚡"];
 
 // Home screen: pick NCERT (pre-seeded quizzes) or PDF Upload (AI-generated quiz).
 export default function GameMode({ onSelectMode }) {

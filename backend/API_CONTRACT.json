@@ -32,18 +32,16 @@
       "request": {
         "code": "ABC1",
         "name": "Arjun",
-        "avatar": "🦁"
+        "avatar": "🔥"
       },
       "response": {
         "student_id": 42,
         "classroom_id": 1,
         "avatar_choices": [
-          "🎮",
-          "💼",
-          "🏢",
-          "🦁",
-          "🚀",
-          "🍊"
+          "⚔️",
+          "🛡️",
+          "🔥",
+          "⚡"
         ]
       }
     },

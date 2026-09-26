@@ -35,7 +35,7 @@ app.add_middleware(
 )
 
 VALID_DIFFICULTIES = {"easy", "medium", "hard"}
-AVATAR_CHOICES = ["🎮", "💼", "🏢", "🦁", "🚀", "🍊"]  # keep in sync with AVATARS in frontend/src/GameMode.jsx
+AVATAR_CHOICES = ["⚔️", "🛡️", "🔥", "⚡"]  # keep in sync with AVATARS in frontend/src/GameMode.jsx
 WIN_XP = 10
 XP_PER_LEVEL = 50
 MAX_LEVEL = 10
