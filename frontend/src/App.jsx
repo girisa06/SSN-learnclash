@@ -340,7 +340,7 @@ function Lobby({ student, mode, onPlay, onLeave, onChangeMode, onChallenge, onWa
                 {board.map((s, i) => (
                   <tr key={s.id} className={s.id === student.studentId ? "me" : ""}>
                     <td><span className={`place-badge${["gold", "silver", "bronze"][i] ? ` ${["gold", "silver", "bronze"][i]}` : ""}`}>{i + 1}</span></td>
-                    <td>{s.avatar && <span className="avatar-sm" aria-hidden="true">{s.avatar}</span>}{s.name}</td>
+                    <td><span className="avatar-sm" aria-hidden="true">{s.avatar || "👤"}</span>{s.name}</td>
                     <td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td>
                   </tr>
                 ))}
