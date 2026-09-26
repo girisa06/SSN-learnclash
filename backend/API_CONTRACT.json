@@ -171,6 +171,7 @@
         "challenges": [
           {
             "id": 7,
+            "quiz_id": 3,
             "quiz_title": "Science Basics",
             "opponent_name": "Priya",
             "opponent_id": 43,

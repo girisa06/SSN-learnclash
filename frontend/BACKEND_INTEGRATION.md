@@ -5,9 +5,9 @@
 2. Start it: `cd backend && python -m uvicorn main:app --host 0.0.0.0 --reload`
    (`--host 0.0.0.0` lets a phone or second laptop reach it; restart after editing `.env`, `--reload` does not watch it.)
 3. `http://localhost:8000/health` must return `{"status":"ok"}`. `http://localhost:8000/docs` lists all routes.
-4. Point the frontend at it: `api.js` reads `VITE_API_BASE_URL`. `frontend/.env.local` currently points at **Render**;
-   set `VITE_API_BASE_URL=http://localhost:8000` there (or in `.env.development.local`) to test locally, then restart Vite.
-5. Open DevTools (F12) → **Network** tab and watch the `/api/...` requests. `api.js` does not log requests to the console.
+4. Run the frontend: `cd frontend && npm install && npm run dev` (Vite serves on port 5173, also reachable from other devices on your Wi-Fi).
+   It reads `VITE_API_BASE_URL` from `frontend/.env.local`, currently `http://localhost:8000`; use the Render URL instead to test against production, then restart Vite.
+5. Open DevTools (F12) -> **Network** tab and watch the `/api/...` requests; the **Console** tab shows any render error (the app also prints render errors on screen instead of a blank page).
 
 ## Production (Render)
 1. Backend: `https://gamified-quiz-887m.onrender.com` (free tier sleeps; first request after idle took ~35 s, so hit `/health` first).
@@ -23,7 +23,7 @@
 | `GET /api/quizzes/{id}` | - | `{quiz, questions:[{id,q,options,difficulty,explanation}]}` (no answers) |
 | `POST /api/quizzes/{id}/answer` | `{question_id, answer_index}` (0-3; `selected_option` "A"-"D" also accepted) | `{question_id, correct, is_correct, correct_answer, topic, explanation}` |
 | `POST /api/challenges/create` | `{quiz_id, student_a_id, student_b_id}` | `{challenge_id}` |
-| `GET /api/challenges/{student_id}` | - | `{challenges:[{id,quiz_title,opponent_name,opponent_id,status,my_score,opponent_score,winner_id}]}` |
+| `GET /api/challenges/{student_id}` | - | `{challenges:[{id,quiz_id,quiz_title,opponent_name,opponent_id,status,my_score,opponent_score,winner_id}]}` |
 | `POST /api/challenges/{challenge_id}/submit` | `{student_id, score}` (0-100; challenge id is in the **URL**) | `{status, winner_id, xp_earned, level_up, new_level, student_a_new_rating, student_b_new_rating}` |
 | `POST /api/mastery/update` | `{student_id, topic, correct}` | `{topic, p_know}` |
 | `GET /api/students/{id}/stats` | - | `{student_id, elo, current_streak, mastery:[{topic,p_know}]}` |

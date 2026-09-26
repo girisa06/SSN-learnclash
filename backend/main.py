@@ -428,6 +428,7 @@ class ChallengeCreateResponse(BaseModel):
 
 class ChallengeSummary(BaseModel):
     id: int
+    quiz_id: int
     quiz_title: str
     opponent_name: str
     opponent_id: int
@@ -537,6 +538,7 @@ def get_student_challenges(student_id: int, db: Session = Depends(get_db)):
             result.append(
                 {
                     "id": c.id,
+                    "quiz_id": c.quiz_id,
                     "quiz_title": quiz.title if quiz else "",
                     "opponent_name": opponent.name if opponent else "",
                     "opponent_id": opponent_id,
