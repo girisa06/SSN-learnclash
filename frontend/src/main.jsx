@@ -15,10 +15,10 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="card error">
+        <div className="card error-card">
           <h2>Something went wrong</h2>
           <pre>{String(this.state.error?.message ?? this.state.error)}</pre>
-          <button onClick={() => window.location.reload()}>Reload</button>
+          <button className="btn" onClick={() => window.location.reload()}>Reload</button>
         </div>
       );
     }

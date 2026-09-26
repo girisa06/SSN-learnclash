@@ -11,19 +11,56 @@ import {
   rememberStudent,
 } from "./game.js";
 
-const errText = (e) => e?.message ?? String(e);
+// Turns a raw fetch/API error into a message a player (or teammate) can act on.
+function friendlyError(e) {
+  const raw = e?.message ?? String(e);
+  if (/Failed to fetch|NetworkError|Load failed/i.test(raw)) {
+    return { message: "Can't reach the quiz server.", detail: "Check that the backend is running and VITE_API_BASE_URL is correct." };
+  }
+  if (/\/answer failed \(404\)/.test(raw) && /Not Found/.test(raw) && !/Question not found/.test(raw)) {
+    return { message: "The quiz server doesn't have the answer-checking route.", detail: "The backend is running old code. Restart it from SSN-learnclash/backend (or redeploy Render), then try again." };
+  }
+  if (/\(404\)/.test(raw) && /Classroom not found/.test(raw)) {
+    return { message: "That class code doesn't exist.", detail: "Check the 4-character code with your teacher." };
+  }
+  return { message: raw };
+}
+
+/* ------------------------------------------------------- small pieces */
+function Spinner() {
+  return <span className="spinner" role="status" aria-label="Loading" />;
+}
+
+function Loading({ text = "Loading..." }) {
+  return <div className="loading"><Spinner /> {text}</div>;
+}
+
+// Inline, dismissible error. Accepts a raw Error/string or an already-friendly {message, detail}.
+function ErrorMsg({ error, onDismiss }) {
+  if (!error) return null;
+  const { message, detail } = typeof error === "object" && "message" in error && !(error instanceof Error) ? error : friendlyError(error);
+  return (
+    <div className="error" role="alert">
+      <div>
+        <div>{message}</div>
+        {detail && <div className="error-detail">{detail}</div>}
+      </div>
+      <button className="close" onClick={onDismiss} aria-label="Dismiss error">&times;</button>
+    </div>
+  );
+}
 
 /* ---------------------------------------------------------------- join */
 function Join({ onJoined }) {
   const [code, setCode] = useState("8JUJ");
   const [name, setName] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       const res = await joinClass(code.trim().toUpperCase(), name.trim());
       const student = { studentId: res.student_id, classroomId: res.classroom_id, name: name.trim() };
@@ -31,7 +68,7 @@ function Join({ onJoined }) {
       localStorage.setItem("quizDuel.name", student.name);
       onJoined(student);
     } catch (err) {
-      setError(errText(err));
+      setError(friendlyError(err));
     } finally {
       setBusy(false);
     }
@@ -40,10 +77,18 @@ function Join({ onJoined }) {
   return (
     <form className="card" onSubmit={submit}>
       <h2>Join a classroom</h2>
-      <div className="row"><label>Class code</label><input value={code} onChange={(e) => setCode(e.target.value)} maxLength={4} required /></div>
-      <div className="row"><label>Your name</label><input value={name} onChange={(e) => setName(e.target.value)} required /></div>
-      <button disabled={busy || !name.trim()}>{busy ? "Joining..." : "Join"}</button>
-      {error && <div className="msg bad">{error}</div>}
+      <ErrorMsg error={error} onDismiss={() => setError(null)} />
+      <div className="field">
+        <label htmlFor="code">Class code</label>
+        <input id="code" className="input" value={code} onChange={(e) => setCode(e.target.value)} maxLength={4} required autoCapitalize="characters" />
+      </div>
+      <div className="field">
+        <label htmlFor="name">Your name</label>
+        <input id="name" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Arjun" required />
+      </div>
+      <button className="btn btn-block" disabled={busy || !name.trim()}>
+        {busy && <Spinner />} {busy ? "Joining..." : "Join Game"}
+      </button>
     </form>
   );
 }
@@ -58,28 +103,32 @@ function Play({ student, quizId, challenge, onExit }) {
   const [duel, setDuel] = useState(null);
   const [friendId, setFriendId] = useState("");
   const [note, setNote] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [, rerender] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     getQuiz(quizId)
       .then((quiz) => {
         if (cancelled) return;
         sessionRef.current = createQuizSession(quiz, { studentId: student.studentId });
         setQuestion(nextQuestion(sessionRef.current));
       })
-      .catch((e) => setError(errText(e)));
+      .catch((e) => !cancelled && setError(friendlyError(e)))
+      .finally(() => !cancelled && setLoading(false));
     return () => { cancelled = true; };
   }, [quizId, student.studentId]);
 
   const pick = async (index) => {
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       setFeedback({ ...(await answerQuestion(sessionRef.current, index)), picked: index });
     } catch (e) {
-      setError(errText(e));
+      setError(friendlyError(e));
     } finally {
       setBusy(false);
     }
@@ -92,56 +141,70 @@ function Play({ student, quizId, challenge, onExit }) {
     const r = finishQuiz(sessionRef.current);
     setResult(r);
     setQuestion(null);
+    rerender((n) => n + 1);
     if (challenge) {
+      setBusy(true);
       try {
         setDuel(await finishChallenge(challenge.id, student.studentId, r));
       } catch (e) {
-        setError(errText(e));
+        setError(friendlyError(e));
+      } finally {
+        setBusy(false);
       }
     }
   };
 
   const challengeFriend = async () => {
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       const { challenge_id } = await createChallenge(Number(friendId), quizId, student.studentId);
       setDuel(await finishChallenge(challenge_id, student.studentId, result));
       setNote(`Challenge #${challenge_id} sent. Your friend plays it from "My challenges".`);
     } catch (e) {
-      setError(errText(e));
+      setError(friendlyError(e));
     } finally {
       setBusy(false);
     }
   };
 
+  const session = sessionRef.current;
+  const total = session?.quiz.questions.length ?? 0;
+  const done = session?.answered.length ?? 0;
+
   return (
     <div className="card">
-      <button onClick={onExit}>Back</button>
-      {error && <div className="msg bad">{error}</div>}
-      {!question && !result && !error && <p>Loading quiz...</p>}
+      <div className="card-title">
+        <h3>{session?.quiz.title ?? "Quiz"}</h3>
+        <button className="btn btn-secondary btn-small" onClick={onExit}>Back</button>
+      </div>
+      <ErrorMsg error={error} onDismiss={() => setError(null)} />
+      {loading && <Loading text="Loading quiz..." />}
 
       {question && (
         <>
-          <h3>{question.q}</h3>
-          <p className="muted">Difficulty: {question.difficulty}</p>
-          {question.options.map((opt, i) => (
-            <button
-              key={i}
-              className={`option${feedback && feedback.picked === i ? (feedback.correct ? " right" : "") : ""}`}
-              disabled={busy || !!feedback}
-              onClick={() => pick(i)}
-            >
-              {opt}
-            </button>
-          ))}
+          <div className="muted">Question {Math.min(done + 1, total)} of {total} &middot; {question.difficulty}</div>
+          <div className="progress"><span style={{ width: `${total ? (done / total) * 100 : 0}%` }} /></div>
+          <div className="question">{question.q}</div>
+          {question.options.map((opt, i) => {
+            const picked = feedback && feedback.picked === i;
+            const cls = picked ? (feedback.correct ? " right" : " wrong") : "";
+            return (
+              <button key={i} className={`option${cls}`} disabled={busy || !!feedback} onClick={() => pick(i)}>
+                {opt}
+              </button>
+            );
+          })}
+          {busy && !feedback && <Loading text="Checking answer..." />}
           {feedback && (
             <>
-              <div className={`msg ${feedback.correct ? "ok" : "bad"}`}>
-                {feedback.correct ? "Correct!" : "Not quite."} {feedback.explanation}
-                <div className="muted">+{feedback.points} pts, +{feedback.xp} XP, streak {feedback.streak}{feedback.combo ? ` - ${feedback.combo}` : ""}; next difficulty: {feedback.difficulty}</div>
+              <div className={`notice${feedback.correct ? "" : " bad"}`}>
+                <div>
+                  <strong>{feedback.correct ? "Correct!" : "Not quite."}</strong> {feedback.explanation}
+                  <div className="error-detail">+{feedback.points} pts, +{feedback.xp} XP &middot; streak {feedback.streak}{feedback.combo ? ` - ${feedback.combo}` : ""} &middot; next: {feedback.difficulty}</div>
+                </div>
               </div>
-              <button onClick={advance}>Next</button>
+              <button className="btn btn-block" onClick={advance}>Next Question</button>
             </>
           )}
         </>
@@ -149,22 +212,26 @@ function Play({ student, quizId, challenge, onExit }) {
 
       {result && (
         <>
-          <h3>Score: {result.score}/100</h3>
-          <p className="muted">{result.earnedPoints}/{result.maxPoints} points, best streak {result.bestStreak}, {result.earnedXp} XP</p>
+          <h2>Quiz complete</h2>
+          <p className="score">{result.score}<span className="muted"> / 100</span></p>
+          <p className="muted">{result.earnedPoints}/{result.maxPoints} points &middot; best streak {result.bestStreak} &middot; {result.earnedXp} XP</p>
+          {busy && <Loading text="Submitting your score..." />}
           {duel && (
-            <div className="msg ok">
+            <div className="notice">
               {duel.status === "done"
                 ? `Duel finished. ${duel.winner_id == null ? "It's a tie." : duel.winner_id === student.studentId ? "You won!" : "You lost."} Ratings: A ${duel.student_a_new_rating}, B ${duel.student_b_new_rating}`
                 : "Score submitted. Waiting for your opponent to play."}
             </div>
           )}
-          {note && <div className="msg ok">{note}</div>}
+          {note && <div className="notice">{note}</div>}
           {!challenge && !duel && (
-            <div className="row">
-              <input placeholder="Friend's student id" value={friendId} onChange={(e) => setFriendId(e.target.value)} inputMode="numeric" />
-              <button disabled={busy || !friendId} onClick={challengeFriend}>Challenge friend</button>
+            <div className="field">
+              <label htmlFor="friend">Challenge a friend</label>
+              <input id="friend" className="input" placeholder="Friend's student id" value={friendId} onChange={(e) => setFriendId(e.target.value)} inputMode="numeric" />
+              <button className="btn btn-block" disabled={busy || !friendId} onClick={challengeFriend}>Challenge Friend</button>
             </div>
           )}
+          <button className="btn btn-secondary btn-block" onClick={onExit}>Back to lobby</button>
         </>
       )}
     </div>
@@ -176,10 +243,12 @@ function Lobby({ student, onPlay, onLeave }) {
   const [quizzes, setQuizzes] = useState([]);
   const [challenges, setChallenges] = useState([]);
   const [board, setBoard] = useState([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    setError("");
+    setError(null);
+    setLoading(true);
     try {
       const [q, c, b] = await Promise.all([
         getQuizzes(student.classroomId),
@@ -190,7 +259,9 @@ function Lobby({ student, onPlay, onLeave }) {
       setChallenges(c);
       setBoard(b);
     } catch (e) {
-      setError(errText(e));
+      setError(friendlyError(e));
+    } finally {
+      setLoading(false);
     }
   }, [student.classroomId, student.studentId]);
 
@@ -198,52 +269,80 @@ function Lobby({ student, onPlay, onLeave }) {
 
   return (
     <>
-      <div className="card">
-        <div className="row">
-          <div><strong>{student.name || "Student"}</strong> <span className="muted">id {student.studentId} - class {student.classroomId}</span></div>
-          <div><button onClick={load}>Refresh</button> <button onClick={onLeave}>Leave</button></div>
+      <div className="card profile">
+        <div>
+          <div className="profile-name">{student.name || "Student"}</div>
+          <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId}</div>
         </div>
-        {error && <div className="msg bad">{error}</div>}
+        <div className="btn-row">
+          <button className="btn btn-secondary btn-small" onClick={load} disabled={loading}>Refresh</button>
+          <button className="btn btn-secondary btn-small" onClick={onLeave}>Leave</button>
+        </div>
       </div>
+
+      <ErrorMsg error={error} onDismiss={() => setError(null)} />
 
       <div className="card">
         <h3>Quizzes</h3>
-        {quizzes.length === 0 && <p className="muted">No quizzes yet.</p>}
-        {quizzes.map((q) => (
-          <div className="row" key={q.id}>
-            <span>{q.title} <span className="muted">({q.subject ?? "General"}, {q.question_count} Qs)</span></span>
-            <button onClick={() => onPlay({ quizId: q.id })}>Play</button>
-          </div>
-        ))}
+        {loading && quizzes.length === 0 && <Loading text="Loading quizzes..." />}
+        {!loading && quizzes.length === 0 && <p className="muted">No quizzes yet.</p>}
+        <div className="quiz-grid">
+          {quizzes.map((q) => (
+            <div className="quiz-card" key={q.id}>
+              <h4>{q.title}</h4>
+              <div><span className="tag">{q.subject ?? "General"}</span> <span className="muted">{q.question_count} questions</span></div>
+              <button className="btn" onClick={() => onPlay({ quizId: q.id })}>Play Quiz</button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="card">
         <h3>My challenges</h3>
-        {challenges.length === 0 && <p className="muted">None yet. Finish a quiz and challenge a friend.</p>}
-        {challenges.map((c) => (
-          <div className="row" key={c.id}>
-            <span>#{c.id} vs {c.opponent_name} - {c.quiz_title} <span className="muted">[{c.status}{c.status === "done" ? `, ${c.my_score}-${c.opponent_score}` : ""}]</span></span>
-            {c.my_score == null && c.status !== "done" && (
-              <button onClick={() => onPlay({ quizId: c.quiz_id ?? quizIdFor(quizzes, c.quiz_title), challenge: c })}>Play</button>
-            )}
-          </div>
-        ))}
+        {loading && challenges.length === 0 && <Loading text="Loading challenges..." />}
+        {!loading && challenges.length === 0 && <p className="muted">None yet. Finish a quiz and challenge a friend.</p>}
+        <ul className="list">
+          {challenges.map((c) => (
+            <li key={c.id}>
+              <div>
+                <div><strong>vs {c.opponent_name}</strong> &middot; {c.quiz_title}</div>
+                <div className="muted">
+                  #{c.id} <span className={`status${c.status === "done" ? " done" : ""}`}>{c.status}</span>
+                  {c.status === "done" ? ` ${c.my_score} - ${c.opponent_score}` : ""}
+                </div>
+              </div>
+              {c.my_score == null && c.status !== "done" && (
+                <button className="btn btn-small" onClick={() => onPlay({ quizId: c.quiz_id ?? quizIdFor(quizzes, c.quiz_title), challenge: c })}>Play Quiz</button>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="card">
         <h3>Leaderboard</h3>
-        <table>
-          <thead><tr><th>Name</th><th>Level</th><th>XP</th><th>Elo</th></tr></thead>
-          <tbody>
-            {board.map((s) => (<tr key={s.id}><td>{s.name} <span className="muted">#{s.id}</span></td><td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td></tr>))}
-          </tbody>
-        </table>
+        {loading && board.length === 0 && <Loading text="Loading leaderboard..." />}
+        {board.length > 0 && (
+          <div className="table-scroll">
+            <table className="leaderboard-table">
+              <thead><tr><th>#</th><th>Name</th><th>Level</th><th>XP</th><th>Elo</th></tr></thead>
+              <tbody>
+                {board.map((s, i) => (
+                  <tr key={s.id} className={s.id === student.studentId ? "me" : ""}>
+                    <td>{i + 1}</td><td>{s.name}</td><td>{s.level}</td><td>{s.xp}</td><td>{s.rating}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!loading && board.length === 0 && <p className="muted">No players yet.</p>}
       </div>
     </>
   );
 }
 
-// The challenges API returns the quiz title; map it back to a quiz id from the classroom's quiz list.
+// Fallback for servers that don't return quiz_id on challenges yet: match by title.
 function quizIdFor(quizzes, title) {
   return quizzes.find((q) => q.title === title)?.id;
 }
