@@ -66,6 +66,32 @@ p { margin: 0 0 12px; }
 .btn-block { width: 100%; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
+.btn-success { background: var(--success); }
+.btn-success:hover:not(:disabled) { background: #0e9f6e; }
+
+/* ---------- mode selection ---------- */
+.mode-list { display: flex; flex-direction: column; gap: 20px; }
+.mode-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 16px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  cursor: pointer;
+  color: var(--text-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.mode-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+.mode-card h3 { margin: 0 0 8px; color: var(--primary); }
+.mode-card p { margin: 0; color: var(--text-muted); }
+.mode-pdf { border-color: var(--success); }
+.mode-pdf h3 { color: var(--success); }
+
 /* ---------- forms ---------- */
 .field { margin-bottom: 16px; }
 .field label { display: block; font-weight: 600; margin-bottom: 6px; }

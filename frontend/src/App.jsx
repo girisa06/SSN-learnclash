@@ -10,6 +10,8 @@ import {
   nextQuestion,
   rememberStudent,
 } from "./game.js";
+import GameMode from "./GameMode.jsx";
+import PDFUpload from "./PDFUpload.jsx";
 
 // Turns a raw fetch/API error into a message a player (or teammate) can act on.
 function friendlyError(e) {
@@ -51,7 +53,7 @@ function ErrorMsg({ error, onDismiss }) {
 }
 
 /* ---------------------------------------------------------------- join */
-function Join({ onJoined }) {
+function Join({ onJoined, onBack }) {
   const [code, setCode] = useState("8JUJ");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
@@ -89,6 +91,7 @@ function Join({ onJoined }) {
       <button className="btn btn-block" disabled={busy || !name.trim()}>
         {busy && <Spinner />} {busy ? "Joining..." : "Join Game"}
       </button>
+      <button type="button" className="btn btn-secondary btn-block" style={{ marginTop: 10 }} onClick={onBack}>Back</button>
     </form>
   );
 }
@@ -239,7 +242,7 @@ function Play({ student, quizId, challenge, onExit }) {
 }
 
 /* --------------------------------------------------------------- lobby */
-function Lobby({ student, onPlay, onLeave }) {
+function Lobby({ student, mode, onPlay, onLeave, onChangeMode }) {
   const [quizzes, setQuizzes] = useState([]);
   const [challenges, setChallenges] = useState([]);
   const [board, setBoard] = useState([]);
@@ -272,15 +275,23 @@ function Lobby({ student, onPlay, onLeave }) {
       <div className="card profile">
         <div>
           <div className="profile-name">{student.name || "Student"}</div>
-          <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId}</div>
+          <div className="muted">Student #{student.studentId} &middot; Class {student.classroomId} &middot; {mode === "pdf" ? "PDF mode" : "NCERT mode"}</div>
         </div>
         <div className="btn-row">
+          <button className="btn btn-secondary btn-small" onClick={onChangeMode}>Change mode</button>
           <button className="btn btn-secondary btn-small" onClick={load} disabled={loading}>Refresh</button>
           <button className="btn btn-secondary btn-small" onClick={onLeave}>Leave</button>
         </div>
       </div>
 
       <ErrorMsg error={error} onDismiss={() => setError(null)} />
+
+      {mode === "pdf" && (
+        <PDFUpload
+          classroomId={student.classroomId}
+          onQuizGenerated={(quiz) => onPlay({ quizId: quiz.id })}
+        />
+      )}
 
       <div className="card">
         <h3>Quizzes</h3>
@@ -354,10 +365,20 @@ export default function App() {
     return saved?.studentId != null ? { ...saved, name: localStorage.getItem("quizDuel.name") ?? "" } : null;
   });
   const [playing, setPlaying] = useState(null);
+  // 'ncert' | 'pdf' | null. Flow: mode -> join -> lobby -> quiz.
+  const [gameMode, setGameMode] = useState(() => {
+    try { return localStorage.getItem("quizDuel.mode"); } catch { return null; }
+  });
+
+  const chooseMode = (mode) => {
+    try { mode ? localStorage.setItem("quizDuel.mode", mode) : localStorage.removeItem("quizDuel.mode"); } catch { /* storage unavailable */ }
+    setGameMode(mode);
+  };
 
   const leave = () => {
     localStorage.removeItem("quizDuel.student");
     localStorage.removeItem("quizDuel.name");
+    chooseMode(null);
     setPlaying(null);
     setStudent(null);
   };
@@ -365,9 +386,12 @@ export default function App() {
   return (
     <>
       <h1>Quiz Duel</h1>
-      {!student && <Join onJoined={setStudent} />}
-      {student && !playing && <Lobby student={student} onPlay={setPlaying} onLeave={leave} />}
-      {student && playing && (
+      {!gameMode && <GameMode onSelectMode={chooseMode} />}
+      {gameMode && !student && <Join onJoined={setStudent} onBack={() => chooseMode(null)} />}
+      {gameMode && student && !playing && (
+        <Lobby student={student} mode={gameMode} onPlay={setPlaying} onLeave={leave} onChangeMode={() => chooseMode(null)} />
+      )}
+      {gameMode && student && playing && (
         <Play student={student} quizId={playing.quizId} challenge={playing.challenge} onExit={() => setPlaying(null)} />
       )}
     </>
